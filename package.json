@@ -4,6 +4,7 @@
   "description": "Find recipes you can make from the ingredients you have.",
   "type": "module",
   "scripts": {
-    "test": "node --test"
+    "test": "node --test",
+    "start": "node server.js"
   }
 }
