@@ -13,7 +13,12 @@ export const PANTRY_KEY = "pantry-match:pantry";
 // Returns true if it saved, false if it couldn't (storage missing, full or
 // blocked). Must never throw, and must not change the items array.
 export function savePantry(storage, items) {
-  // TODO: your code here
+  try {
+    storage.setItem(PANTRY_KEY, JSON.stringify(items));
+    return true;
+  } catch (e) {
+    return false;
+  }
 }
 
 // Reads the saved list back from storage.
@@ -21,5 +26,18 @@ export function savePantry(storage, items) {
 // value isn't an array, or storage is missing or throws. Keeps only entries
 // that are non-blank strings, trimmed.
 export function loadPantry(storage) {
-  // TODO: your code here
+  
+  try {
+    const data = storage.getItem(PANTRY_KEY);
+    if (!data) {
+      return [];
+    }
+    const items = JSON.parse(data);
+    if (!Array.isArray(items)) {
+      return [];
+    }
+    return items.filter((s) => typeof s === "string" && s.trim() !== "").map((s) => s.trim());
+  } catch (e) {
+    return [];
+  }
 }
