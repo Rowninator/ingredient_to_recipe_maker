@@ -113,6 +113,7 @@
       margin: 20px 2px 8px;
     }
     .section-head h2 { margin: 0; font-size: .8rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+    .saved-note { margin: -4px 2px 10px; font-size: .8rem; color: var(--muted); }
     .link-btn { background: none; border: 0; padding: 8px 0 8px 12px; color: var(--brand); font-size: .9rem; font-weight: 600; }
 
     .chips { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -176,9 +177,10 @@
 
       <section id="pantry" hidden>
         <div class="section-head">
-          <h2>Your ingredients</h2>
+          <h2>Your pantry</h2>
           <button class="link-btn" id="clear-btn" type="button">Clear all</button>
         </div>
+        <p class="saved-note" id="saved-note">Saved on this device</p>
         <div class="chips" id="chips"></div>
       </section>
 
@@ -193,6 +195,7 @@
     import { matchRecipes, sameIngredient } from "./match.js";
     import { recipes } from "./recipes.js";
     import { parseIngredients } from "./parse.js";
+    import { savePantry, loadPantry } from "./pantry.js";
 
     const form = document.getElementById("add-form");
     const input = document.getElementById("ing-input");
@@ -200,7 +203,19 @@
     const chipsEl = document.getElementById("chips");
     const results = document.getElementById("results");
 
-    let have = [];
+    // Some private-browsing modes throw just for reading localStorage; then the page works without saving.
+    let storage = null;
+    try { storage = window.localStorage; } catch {}
+    if (!storage) document.getElementById("saved-note").textContent = "Not saved: this browser is blocking storage";
+
+    let have = loadPantry(storage);
+
+    // The only place the pantry changes, so every change is saved.
+    function setPantry(next) {
+      have = next;
+      savePantry(storage, have);
+      render();
+    }
 
     // Most-used ingredients across all recipes, for the "try adding" chips.
     const popular = (() => {
@@ -216,15 +231,15 @@
     }
 
     function add(names) {
+      const next = [...have];
       for (const name of names) {
-        if (!have.some((h) => sameIngredient(h, name))) have.push(name);
+        if (!next.some((h) => sameIngredient(h, name))) next.push(name);
       }
-      render();
+      setPantry(next);
     }
 
     function remove(name) {
-      have = have.filter((h) => h !== name);
-      render();
+      setPantry(have.filter((h) => h !== name));
     }
 
     function suggestionChips(count) {
@@ -294,8 +309,8 @@
     });
 
     document.getElementById("clear-btn").addEventListener("click", () => {
-      have = [];
-      render();
+      if (!confirm("Clear your whole pantry?")) return;
+      setPantry([]);
       input.focus();
     });
 

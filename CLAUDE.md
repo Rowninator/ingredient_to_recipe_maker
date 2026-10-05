@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This repo is built in `/app-coach` lessons. The learner writes certain functions themselves; do not write or rewrite them unless the learner asks after a genuine attempt:
 - `matchRecipes` and `sameIngredient` in `match.js` (Level 1)
-- the pantry save and load functions (Level 2)
+- `savePantry` and `loadPantry` in `pantry.js` (Level 2)
 
 Give the smallest useful hint instead (the failing test, the line, or the concept to look up).
 
@@ -21,7 +21,8 @@ The current level's approved design and step list are in `PLAN.md`; follow it an
 
 ## Architecture
 
-- Plain ES modules (`"type": "module"`) shared by Node tests and the browser, so `match.js`, `parse.js` and `recipes.js` must not use Node-only or browser-only APIs.
+- Plain ES modules (`"type": "module"`) shared by Node tests and the browser, so `match.js`, `parse.js`, `recipes.js` and `pantry.js` must not use Node-only or browser-only APIs. `pantry.js` takes storage as a parameter (the page passes `localStorage`, or `null` if it's blocked; tests pass a fake).
+- The pantry is saved as JSON under the localStorage key `"pantry-match:pantry"`. In `index.html`, every change goes through `setPantry(next)`, which saves and re-renders; don't assign `have` anywhere else.
 - `index.html` is the whole UI ("Pantry Match"): CSS and an inline `<script type="module">` that imports the modules above. Build DOM with `textContent` (via its `el()` helper), never `innerHTML`, since ingredient names are user input.
 - `server.js` exists only because browsers block module imports from `file://`. The live site is GitHub Pages serving `main` from the repo root (https://rowninator.github.io/ingredient_to_recipe_maker/), so keep all imports and asset paths relative (`./match.js`).
 
