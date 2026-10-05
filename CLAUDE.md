@@ -24,7 +24,7 @@ The current level's approved design and step list are in `PLAN.md`; follow it an
 - Plain ES modules (`"type": "module"`) shared by Node tests and the browser, so `match.js`, `parse.js`, `recipes.js` and `pantry.js` must not use Node-only or browser-only APIs. `pantry.js` takes storage as a parameter (the page passes `localStorage`, or `null` if it's blocked; tests pass a fake).
 - The pantry is saved as JSON under the localStorage key `"pantry-match:pantry"`. In `index.html`, every change goes through `setPantry(next)`, which saves and re-renders; don't assign `have` anywhere else.
 - `index.html` is the whole UI ("Pantry Match"): CSS and an inline `<script type="module">` that imports the modules above. Build DOM with `textContent` (via its `el()` helper), never `innerHTML`, since ingredient names are user input.
-- `server.js` exists only because browsers block module imports from `file://`. The live site is GitHub Pages serving `main` from the repo root (https://rowninator.github.io/ingredient_to_recipe_maker/), so keep all imports and asset paths relative (`./match.js`).
+- `server.js` exists only because browsers block module imports from `file://`. It listens on 127.0.0.1 only, refuses any path with a part starting with `.` (`isHiddenPath`, tested in `server.test.js`), and starts only when run directly, so tests can import it. The live site is GitHub Pages serving `main` from the repo root (https://rowninator.github.io/ingredient_to_recipe_maker/), so keep all imports and asset paths relative (`./match.js`).
 
 ## Matching rules (locked in by `match.test.js`)
 

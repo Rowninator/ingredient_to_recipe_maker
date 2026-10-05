@@ -206,14 +206,17 @@
     // Some private-browsing modes throw just for reading localStorage; then the page works without saving.
     let storage = null;
     try { storage = window.localStorage; } catch {}
-    if (!storage) document.getElementById("saved-note").textContent = "Not saved: this browser is blocking storage";
+    const savedNote = document.getElementById("saved-note");
+    if (!storage) savedNote.textContent = "Not saved: this browser is blocking storage";
 
     let have = loadPantry(storage);
 
     // The only place the pantry changes, so every change is saved.
     function setPantry(next) {
       have = next;
-      savePantry(storage, have);
+      if (storage) {
+        savedNote.textContent = savePantry(storage, have) ? "Saved on this device" : "Couldn't save on this device";
+      }
       render();
     }
 
