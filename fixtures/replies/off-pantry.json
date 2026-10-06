@@ -1,0 +1,18 @@
+{
+  "id": "msg_sample_off_pantry",
+  "type": "message",
+  "role": "assistant",
+  "model": "claude-haiku-4-5",
+  "content": [
+    {
+      "type": "text",
+      "text": "{\"recipes\":[{\"name\":\"Bacon and Egg Scramble\",\"ingredients\":[\"eggs\",\"bacon\",\"salt\"],\"steps\":[\"Fry the bacon.\",\"Add the beaten eggs.\",\"Stir until set.\"]},{\"name\":\"Cheese Flatbread\",\"ingredients\":[\"flour\",\"cheese\",\"water\",\"oil\"],\"steps\":[\"Mix the flour and water into a dough.\",\"Roll it flat and fry in oil.\",\"Top with cheese.\"]},{\"name\":\"Simple Tomato Salad\",\"ingredients\":[\"tomatoes\",\"oil\",\"salt\",\"pepper\"],\"steps\":[\"Slice the tomatoes.\",\"Drizzle with oil.\",\"Season with salt and pepper.\"]}]}"
+    }
+  ],
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "usage": {
+    "input_tokens": 412,
+    "output_tokens": 236
+  }
+}

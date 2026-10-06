@@ -1,6 +1,15 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import { buildPrompt, checkSuggestions, BASICS } from "./suggest.js";
+
+// The parsed JSON inside a saved Claude reply from fixtures/replies/.
+// The saved replies were all written for REPLY_PANTRY.
+const REPLY_PANTRY = ["eggs", "cheese", "spinach", "tomatoes"];
+function savedReplyData(name) {
+  const message = JSON.parse(readFileSync(new URL(`./fixtures/replies/${name}.json`, import.meta.url), "utf8"));
+  return JSON.parse(message.content[0].text);
+}
 
 // The text between <pantry> and </pantry> in the user message.
 function pantryPart(prompt) {
@@ -74,6 +83,27 @@ test("buildPrompt does not change its input", () => {
   const items = ["  eggs ", "", "eggs", "cheese"];
   buildPrompt(items);
   assert.deepEqual(items, ["  eggs ", "", "eggs", "cheese"]);
+});
+
+// --- checkSuggestions: saved sample replies ---
+
+test("checkSuggestions keeps all 3 recipes from a good saved reply", () => {
+  const data = savedReplyData("good");
+  assert.deepEqual(checkSuggestions(data, REPLY_PANTRY), data.recipes);
+});
+
+test("checkSuggestions returns [] for a saved reply in the wrong shape", () => {
+  assert.deepEqual(checkSuggestions(savedReplyData("wrong-shape"), REPLY_PANTRY), []);
+});
+
+test("checkSuggestions keeps only the complete recipe from a saved reply with missing fields", () => {
+  const names = checkSuggestions(savedReplyData("missing-fields"), REPLY_PANTRY).map((r) => r.name);
+  assert.deepEqual(names, ["Spinach Egg Cups"]);
+});
+
+test("checkSuggestions drops saved recipes that need ingredients you don't have", () => {
+  const names = checkSuggestions(savedReplyData("off-pantry"), REPLY_PANTRY).map((r) => r.name);
+  assert.deepEqual(names, ["Simple Tomato Salad"]);
 });
 
 // --- checkSuggestions: shape of data ---

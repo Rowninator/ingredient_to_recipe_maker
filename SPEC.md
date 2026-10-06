@@ -23,8 +23,10 @@ Pantry Match can only suggest its 20 built-in recipes. Level 3 adds a **"Suggest
    4. Calls `buildPrompt(pantry)` (written by the learner), then the Claude Messages API using the official `@anthropic-ai/sdk`, structured outputs (`output_config.format` with a JSON schema matching the shape below) and `max_tokens` 2048. The key comes from `env.ANTHROPIC_API_KEY`. The call has a **15-second time limit** and at most 1 retry (SDK `timeout: 15000`, `maxRetries: 1`).
    5. Turns the result into one of these responses. It never passes Claude's raw reply through, and the error body never includes Claude's text or any error details from Anthropic.
       - Timed out → `504 {"error": "timeout"}`.
-      - Broken reply: Claude or Anthropic returned an error, `stop_reason` isn't `end_turn` (for example `max_tokens` or `refusal`), or the text isn't valid JSON → `502 {"error": "bad_reply"}`.
-      - Otherwise it runs `checkSuggestions(data, pantry)` (written by the learner) and returns `200 {"recipes": [...]}`. The list can be empty if every recipe was filtered out.
+      - Claude or Anthropic returned an error → `502 {"error": "bad_reply"}`.
+      - Otherwise the reply goes to `readReply(message, pantry)` in `reply.js` (written by Claude, shared and tested with saved replies), which returns the status and body:
+        - `stop_reason` isn't `end_turn` (for example `max_tokens` or `refusal`), there's no text, or the text isn't valid JSON → `502 {"error": "bad_reply"}`.
+        - Otherwise it runs `checkSuggestions(data, pantry)` (written by the learner) and returns `200 {"recipes": [...]}`. The list can be empty if every recipe was filtered out.
 3. **Browser.** Waits at most **20 seconds**, longer than the Worker's limit so the Worker's own 504 usually arrives first. It uses `AbortController`. It also runs `checkSuggestions(body, pantry)` on the Worker's reply, as a second check in case the proxy is ever wrong. It renders the cards with `el()`/`textContent` only, never `innerHTML`, because the AI text is untrusted.
 
 The browser never builds or sends a prompt. The proxy accepts only a pantry list, so it can't be used as a free general-purpose Claude.
@@ -59,7 +61,22 @@ Claude's reply, which is also the Worker's 200 response:
 - **buildPrompt:** the pantry appears inside the markers; blanks and duplicates are dropped; at most 40 items are kept; it returns `null` for an empty or blank pantry; the system text mentions the basics and the 3-recipe limit; it doesn't change its input.
 - **checkSuggestions:** keeps a valid recipe; handles `null`, a string, or a missing `recipes`; drops a recipe that uses an ingredient that isn't in the pantry; accepts basics and plural forms (`egg` vs `eggs`); enforces the limits on name, ingredient and step counts and lengths; caps the result at 3; trims strings; ignores extra fields; doesn't change its input.
 
-The Worker itself is tested by hand (`wrangler dev` plus the Browser pane), not in `npm test`. That keeps the root project free of dependencies.
+## Saved sample replies (`fixtures/replies/`, `reply.test.js`)
+No test calls the real API. `fixtures/replies/*.json` holds full Claude Messages API replies, hand-written for the pantry `["eggs", "cheese", "spinach", "tomatoes"]`. Once the key exists, `good.json` can be swapped for a real captured reply.
+
+| File | Case | `readReply` gives |
+|---|---|---|
+| `good.json` | 3 valid recipes (uses basics and plurals) | 200, all 3 |
+| `broken-json.json` | chatty text before the JSON, closing brackets missing | 502 `bad_reply` |
+| `cut-off.json` | `stop_reason: "max_tokens"`, the JSON stops halfway | 502 `bad_reply` |
+| `refusal.json` | `stop_reason: "refusal"` (its text is valid JSON) | 502 `bad_reply` |
+| `wrong-shape.json` | valid JSON, `recipe` instead of a `recipes` list | 200, `[]` |
+| `missing-fields.json` | no name / no steps / ingredients not a list, plus 1 good one | 200, only the good one |
+| `off-pantry.json` | two need `bacon`/`flour`, one needs only pantry items and basics | 200, only the pantry-only one |
+
+`suggest.test.js` also runs `checkSuggestions` on the parsed text of good / wrong-shape / missing-fields / off-pantry. The exact limits stay as inline tests.
+
+The rest of the Worker (CORS, Origin, rate limit, SDK call, time-outs) is tested by hand (`wrangler dev` plus the Browser pane), not in `npm test`. That keeps the root project free of dependencies.
 
 ## Page changes (`index.html`)
 - Adds a new section, "AI ideas", under Top recipes, with a **"Suggest with AI"** button. The button is disabled when the pantry is empty.
@@ -105,7 +122,7 @@ Once the API key exists, nothing gets pushed, deployed or published until **all 
 2. Claude writes the `suggest.js` stubs and `suggest.test.js`. `npm test` shows the new tests failing and the old 45 passing. The learner commits.
 3. The learner writes `buildPrompt` and `checkSuggestions` until `npm test` is all green. Claude gives hints only. A good moment to practice `/rewind`: try a different approach, then rewind if it goes badly.
 4. Checkpoint: `/code-review` in a fresh context, plus tests. Fix, then commit.
-5. The learner creates an Anthropic API key, sets a **$5 monthly spend limit**, and creates a free Cloudflare account. Claude adds `worker/.dev.vars` to `.gitignore` *first*, then scaffolds `worker/` (wrangler config with the rate-limit binding, the SDK call, the Origin check, input checks). The learner puts the key in `.dev.vars`. Check: `wrangler dev` returns recipes for a sample pantry, 403 for a wrong Origin, 429 on the 6th quick request, 400 for a bad body, and 504 when the time limit is temporarily set to 1 second.
+5. The learner creates an Anthropic API key, sets a **$5 monthly spend limit**, and creates a free Cloudflare account. Claude adds `worker/.dev.vars` to `.gitignore` *first*, then scaffolds `worker/` (wrangler config with the rate-limit binding, the SDK call, the Origin check, input checks, and `readReply` from `../reply.js` for the reply). The learner puts the key in `.dev.vars`. Check: `wrangler dev` returns recipes for a sample pantry, 403 for a wrong Origin, 429 on the 6th quick request, 400 for a bad body, and 504 when the time limit is temporarily set to 1 second.
 6. Claude wires the button and the AI cards into `index.html`, pointing at the local Worker. Check in the Browser pane at 375 and 320 width: the loading state and every row of "What the user sees", no console errors, no sideways scroll. Fake the error cases (a stubbed `fetch`, or a Worker with a 1-second limit) so no real money is spent on them.
 7. **Security gate:** all four items above. The learner writes `REVIEW.md` (Claude can check it covers the three points).
 8. Only after the gate passes: `wrangler deploy`, `wrangler secret put ANTHROPIC_API_KEY`, set `PROXY_URL` to the deployed Worker, commit and push. Check on a real phone.
