@@ -113,7 +113,7 @@
       margin: 20px 2px 8px;
     }
     .section-head h2 { margin: 0; font-size: .8rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
-    .saved-note { margin: -4px 2px 10px; font-size: .8rem; color: var(--muted); }
+    .saved-note { margin: 2px 2px 0; font-size: .8rem; color: var(--muted); }
     .link-btn { background: none; border: 0; padding: 8px 0 8px 12px; color: var(--brand); font-size: .9rem; font-weight: 600; }
 
     .chips { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -174,13 +174,14 @@
         <button class="btn" type="submit">Add</button>
       </form>
       <p class="hint">Separate several with commas.</p>
+      <!-- Outside #pantry so a failed save still shows when the pantry is empty. -->
+      <p class="saved-note" id="saved-note">Saved on this device</p>
 
       <section id="pantry" hidden>
         <div class="section-head">
           <h2>Your pantry</h2>
           <button class="link-btn" id="clear-btn" type="button">Clear all</button>
         </div>
-        <p class="saved-note" id="saved-note">Saved on this device</p>
         <div class="chips" id="chips"></div>
       </section>
 
