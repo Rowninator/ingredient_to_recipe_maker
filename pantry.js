@@ -16,7 +16,7 @@ export function savePantry(storage, items) {
   try {
     storage.setItem(PANTRY_KEY, JSON.stringify(items));
     return true;
-  } catch (e) {
+  } catch {
     return false;
   }
 }
@@ -37,7 +37,7 @@ export function loadPantry(storage) {
       return [];
     }
     return items.filter((s) => typeof s === "string" && s.trim() !== "").map((s) => s.trim());
-  } catch (e) {
+  } catch  {
     return [];
   }
 }

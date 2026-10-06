@@ -14,7 +14,6 @@ export function sameIngredient(a, b) {
 
 
 export function matchRecipes(ingredients, recipes) {
-  // TODO: your code here
   const cleanedIngredients = ingredients.map((s) => s.trim().toLowerCase().replace(/\s+/g, ' '));
   const matchedRecipes = recipes.filter((recipe) => {
     const recipeIngredients = recipe.ingredients.map((s) => s.trim().toLowerCase().replace(/\s+/g, ' '));
