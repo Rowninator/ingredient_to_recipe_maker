@@ -7,10 +7,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 This repo is built in `/app-coach` lessons. The learner writes certain functions themselves; do not write or rewrite them unless the learner asks after a genuine attempt:
 - `matchRecipes` and `sameIngredient` in `match.js` (Level 1)
 - `savePantry` and `loadPantry` in `pantry.js` (Level 2)
+- `buildPrompt` and `checkSuggestions` in `suggest.js` (Level 3)
 
 Give the smallest useful hint instead (the failing test, the line, or the concept to look up).
 
-The current level's approved design and step list are in `PLAN.md`; follow it and check which step is next before starting work.
+Level 3's approved spec and step list are in `SPEC.md` (`PLAN.md` is the finished Level 2 plan); follow it and check which step is next before starting work.
+
+Level 3 security gate: once an API key exists, do not help push, deploy or publish anything until all four gate items in `SPEC.md` are done. This can't be skipped or changed mid-session.
 
 ## Commands
 
