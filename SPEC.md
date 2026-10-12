@@ -60,8 +60,8 @@ The AI's reply text, which is also the Worker's 200 response:
   - Trims every string, keeps at most 3 recipes, and doesn't change `data`.
 
 ## Tests Claude writes before the learner codes (`suggest.test.js`)
-- **buildPrompt:** the pantry appears inside the markers; blanks and duplicates are dropped; at most 40 items are kept; it returns `null` for an empty or blank pantry; the system text mentions the basics and the 3-recipe limit; it doesn't change its input.
-- **checkSuggestions:** keeps a valid recipe; handles `null`, a string, or a missing `recipes`; drops a recipe that uses an ingredient that isn't in the pantry; accepts basics and plural forms (`egg` vs `eggs`); enforces the limits on name, ingredient and step counts and lengths; caps the result at 3; trims strings; ignores extra fields; doesn't change its input.
+- **buildPrompt:** the pantry appears inside the markers; blanks and duplicates are dropped; at most 40 items are kept; it returns `null` for an empty or blank pantry; the system text mentions the basics and the 3-recipe limit; `<` and `>` in an item can't break out of the markers; items that aren't text are skipped without crashing; it doesn't change its input.
+- **checkSuggestions:** keeps a valid recipe; handles `null`, a string, or a missing `recipes`; skips pantry items that aren't text without crashing; drops a recipe that uses an ingredient that isn't in the pantry; accepts basics and plural forms (`egg` vs `eggs`); enforces the limits on name, ingredient and step counts and lengths; caps the result at 3; trims strings; ignores extra fields; doesn't change its input.
 
 ## Saved sample replies (`fixtures/replies/`, `reply.test.js`)
 No test calls the real API. `fixtures/replies/*.txt` holds the reply **text only**, with no provider wrapper, hand-written for the pantry `["eggs", "cheese", "spinach", "tomatoes"]`. They're `.txt` files because some aren't valid JSON. Once the key exists, `good.txt` can be swapped for real captured text.

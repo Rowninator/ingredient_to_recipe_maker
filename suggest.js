@@ -18,13 +18,16 @@ export const BASICS = ["salt", "pepper", "oil", "water"];
 // user: the pantry list inside <pantry>...</pantry> markers.
 // Must not change the pantry array.
 export function buildPrompt(pantry) {
-  // TODO: your code here
+
   if (!Array.isArray(pantry)) {
     return null;
   }
 
+  // filter using typeof item === "string" to ensure only strings are processed
+  pantry = pantry.filter((item) => typeof item === "string");
+
   const cleanedPantry = pantry
-    .map((item) => item.trim())
+    .map((item) => item.trim().replace(/[<>]/g, " "))
     .filter((item) => item.length > 0)
     .reduce((unique, item) => {
       if (!unique.some((existing) => sameIngredient(existing, item))) {
@@ -56,13 +59,15 @@ export function buildPrompt(pantry) {
 // - steps is 3-6 non-blank strings, each at most 200 characters
 // Every string is trimmed, and extra fields are left out.
 export function checkSuggestions(data, pantry) {
-  // TODO: your code here
+  
   if (!data || !Array.isArray(data.recipes) || !Array.isArray(pantry)) {
     return [];
   }
 
+  pantry = pantry.filter((item) => typeof item === "string");
+
   const cleanedPantry = pantry
-    .map((item) => item.trim())
+    .map((item) => item.trim().replace(/[<>]/g, " "))
     .filter((item) => item.length > 0)
     .reduce((unique, item) => {
       if (!unique.some((existing) => sameIngredient(existing, item))) {
