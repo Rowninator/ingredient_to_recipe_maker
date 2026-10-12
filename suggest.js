@@ -57,5 +57,65 @@ export function buildPrompt(pantry) {
 // Every string is trimmed, and extra fields are left out.
 export function checkSuggestions(data, pantry) {
   // TODO: your code here
-  
+  if (!data || !Array.isArray(data.recipes) || !Array.isArray(pantry)) {
+    return [];
+  }
+
+  const cleanedPantry = pantry
+    .map((item) => item.trim())
+    .filter((item) => item.length > 0)
+    .reduce((unique, item) => {
+      if (!unique.some((existing) => sameIngredient(existing, item))) {
+        unique.push(item);
+      }
+      return unique;
+    }, []);
+
+  const validRecipes = data.recipes.filter((recipe) => {
+    if (
+      !recipe ||
+      typeof recipe.name !== "string" ||
+      recipe.name.trim().length === 0 ||
+      recipe.name.trim().length > 60 ||
+      !Array.isArray(recipe.ingredients) ||
+      recipe.ingredients.length < 2 ||
+      recipe.ingredients.length > 12 ||
+      !Array.isArray(recipe.steps) ||
+      recipe.steps.length < 3 ||
+      recipe.steps.length > 6
+    ) {
+      return false;
+    }
+
+    const allIngredientsValid = recipe.ingredients.every((ing) => {
+      if (typeof ing !== "string" || ing.trim().length === 0) {
+        return false;
+      }
+      const trimmedIng = ing.trim();
+      return (
+        cleanedPantry.some((pantryItem) => sameIngredient(pantryItem, trimmedIng)) ||
+        BASICS.some((basic) => sameIngredient(basic, trimmedIng))
+      );
+    });
+
+    const allStepsValid = recipe.steps.every((step) => {
+      return typeof step === "string" && step.trim().length > 0 && step.trim().length <= 200;
+    });
+
+    if (!allIngredientsValid || !allStepsValid) {
+      return false;
+    }
+
+    return allIngredientsValid;
+
+    
+  });
+
+  return validRecipes.slice(0, 3).map((recipe) => ({
+    name: recipe.name.trim(),
+    ingredients: recipe.ingredients.map((ing) => ing.trim()).filter((ing) => ing.length > 0),
+    steps: recipe.steps.map((step) => step.trim()).filter((step) => step.length > 0),
+  }));
+
+
 }
