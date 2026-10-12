@@ -1,0 +1,17 @@
+// Cloudflare Worker that calls Gemini for AI recipe suggestions (see SPEC.md).
+// The key is NOT here: it lives in .dev.vars locally (git-ignored) and as a
+// Worker secret in production (`wrangler secret put GEMINI_API_KEY`).
+{
+  "name": "pantry-match-ai",
+  "main": "src/index.js",
+  "compatibility_date": "2026-10-01",
+
+  // 5 requests per 60 seconds per visitor IP.
+  "ratelimits": [
+    {
+      "name": "RATE_LIMITER",
+      "namespace_id": "1001",
+      "simple": { "limit": 5, "period": 60 }
+    }
+  ]
+}
