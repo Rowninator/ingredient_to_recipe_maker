@@ -3,12 +3,11 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { buildPrompt, checkSuggestions, BASICS } from "./suggest.js";
 
-// The parsed JSON inside a saved Claude reply from fixtures/replies/.
+// The parsed JSON of a saved AI reply text from fixtures/replies/.
 // The saved replies were all written for REPLY_PANTRY.
 const REPLY_PANTRY = ["eggs", "cheese", "spinach", "tomatoes"];
 function savedReplyData(name) {
-  const message = JSON.parse(readFileSync(new URL(`./fixtures/replies/${name}.json`, import.meta.url), "utf8"));
-  return JSON.parse(message.content[0].text);
+  return JSON.parse(readFileSync(new URL(`./fixtures/replies/${name}.txt`, import.meta.url), "utf8"));
 }
 
 // The text between <pantry> and </pantry> in the user message.
