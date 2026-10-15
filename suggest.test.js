@@ -87,6 +87,11 @@ test("buildPrompt keeps < and > in a pantry item from breaking out of the marker
   assert.ok(inside.includes("eggs"));
 });
 
+test("buildPrompt drops items that are blank once < and > are removed", () => {
+  assert.equal(buildPrompt(["<>", " < > "]), null);
+  assert.equal(pantryPart(buildPrompt(["<", "eggs"])).trim(), "eggs");
+});
+
 test("buildPrompt skips pantry items that aren't text instead of crashing", () => {
   const inside = pantryPart(buildPrompt(["eggs", null, 7, undefined, { a: 1 }, "cheese"]));
   assert.ok(inside.includes("eggs"));
@@ -153,6 +158,13 @@ test("checkSuggestions drops a recipe with an ingredient not in the pantry", () 
 test("checkSuggestions accepts basics and plural forms", () => {
   const recipe = goodRecipe({ ingredients: ["egg", "Cheese", "salt", "pepper", "oil", "water"] });
   assert.deepEqual(checkSuggestions({ recipes: [recipe] }, PANTRY), [recipe]);
+});
+
+test("checkSuggestions matches basics exactly, not as plurals", () => {
+  const check = (extra) => checkSuggestions({ recipes: [goodRecipe({ ingredients: ["eggs", extra] })] }, PANTRY).length;
+  assert.equal(check(" Salt "), 1, "case and spaces don't matter");
+  assert.equal(check("peppers"), 0, "peppers are a vegetable, not the basic pepper");
+  assert.equal(check("oils"), 0, "oils");
 });
 
 test("checkSuggestions needs 2 to 12 ingredients", () => {

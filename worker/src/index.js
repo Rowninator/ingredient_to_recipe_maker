@@ -7,7 +7,7 @@ import { buildPrompt } from "../../suggest.js";
 import { readReply } from "../../reply.js";
 
 const MODEL = "gemini-3.8-flash";
-const ALLOWED_ORIGINS = ["https://rowninator.github.io", "http://localhost:3000"];
+const PROD_ORIGIN = "https://rowninator.github.io";
 const TIMEOUT_MS = 15000;
 
 // What Gemini must reply with: the "Shapes" section of SPEC.md.
@@ -21,8 +21,8 @@ const RECIPES_SCHEMA = {
         type: "object",
         properties: {
           name: { type: "string" },
-          ingredients: { type: "array", items: { type: "string" } },
-          steps: { type: "array", items: { type: "string" } },
+          ingredients: { type: "array", minItems: 2, maxItems: 12, items: { type: "string" } },
+          steps: { type: "array", minItems: 3, maxItems: 6, items: { type: "string" } },
         },
         required: ["name", "ingredients", "steps"],
       },
@@ -34,7 +34,7 @@ const RECIPES_SCHEMA = {
 export default {
   async fetch(request, env) {
     const origin = request.headers.get("Origin");
-    if (!ALLOWED_ORIGINS.includes(origin)) {
+    if (!allowedOrigins(env).includes(origin)) {
       return json(403, { error: "forbidden" }, null);
     }
     if (request.method === "OPTIONS") {
@@ -45,7 +45,13 @@ export default {
     }
 
     const ip = request.headers.get("CF-Connecting-IP") ?? "unknown";
-    const { success } = await env.RATE_LIMITER.limit({ key: ip });
+    let success;
+    try {
+      ({ success } = await env.RATE_LIMITER.limit({ key: ip }));
+    } catch (error) {
+      console.log("Rate limiter error", error?.name);
+      return json(500, { error: "server_error" }, origin);
+    }
     if (!success) {
       return json(429, { error: "rate_limited" }, origin);
     }
@@ -95,8 +101,15 @@ export default {
   },
 };
 
+// DEV_ORIGIN is set only in worker/.dev.vars, so the deployed Worker
+// allows just the live site.
+function allowedOrigins(env) {
+  return env.DEV_ORIGIN ? [PROD_ORIGIN, env.DEV_ORIGIN] : [PROD_ORIGIN];
+}
+
 // The body must be {"pantry": [...]} with 1-40 strings of at most 40
-// characters each. Returns the list, or null if the body is anything else.
+// characters each and no commas (the prompt separates items with commas).
+// Returns the list, or null if the body is anything else.
 async function readPantry(request) {
   let body;
   try {
@@ -109,7 +122,7 @@ async function readPantry(request) {
     Array.isArray(pantry) &&
     pantry.length >= 1 &&
     pantry.length <= 40 &&
-    pantry.every((item) => typeof item === "string" && item.length <= 40);
+    pantry.every((item) => typeof item === "string" && item.length <= 40 && !item.includes(","));
   return ok ? pantry : null;
 }
 

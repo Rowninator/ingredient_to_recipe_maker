@@ -4,10 +4,28 @@
 //
 // pantry: array of ingredient names, e.g. ["eggs", "  Cheese "]
 
-import { sameIngredient } from "./match.js";
+import { sameIngredient, cleanIngredient } from "./match.js";
 
 // Ingredients every recipe may use even if they aren't in the pantry.
 export const BASICS = ["salt", "pepper", "oil", "water"];
+
+function cleanPantryItem(item) {
+  return item.replace(/[<>]/g, " ").trim();
+}
+
+function cleanPantry(pantry) {
+  return pantry
+    .filter((item) => typeof item === "string")
+    .map((item) => cleanPantryItem(item))
+    .filter((item) => item.length > 0)
+    .reduce((unique, item) => {
+      if (!unique.some((existing) => sameIngredient(existing, item))) {
+        unique.push(item);
+      }
+      return unique;
+    }, []);
+}
+
 
 // Returns { system, user } (two strings), or null if the pantry has no usable
 // items. Trims items, drops blanks and duplicates (using sameIngredient) and
@@ -23,19 +41,8 @@ export function buildPrompt(pantry) {
     return null;
   }
 
-  // filter using typeof item === "string" to ensure only strings are processed
-  pantry = pantry.filter((item) => typeof item === "string");
 
-  const cleanedPantry = pantry
-    .map((item) => item.trim().replace(/[<>]/g, " "))
-    .filter((item) => item.length > 0)
-    .reduce((unique, item) => {
-      if (!unique.some((existing) => sameIngredient(existing, item))) {
-        unique.push(item);
-      }
-      return unique;
-    }, [])
-    .slice(0, 40);
+  const cleanedPantry = cleanPantry(pantry).slice(0, 40);
 
   if (cleanedPantry.length === 0) {
     return null;
@@ -54,8 +61,9 @@ export function buildPrompt(pantry) {
 // from data.recipes. Never throws, and must not change data.
 // Keeps a recipe only if:
 // - name is a non-blank string of at most 60 characters
-// - ingredients is 2-12 non-blank strings, each matching a pantry item or a
-//   basic (via sameIngredient)
+// - ingredients is 2-12 non-blank strings, each matching a pantry item (via
+//   sameIngredient) or exactly matching a basic after trimming, lowercasing
+//   and collapsing spaces (no plural rule: "peppers" is not "pepper")
 // - steps is 3-6 non-blank strings, each at most 200 characters
 // Every string is trimmed, and extra fields are left out.
 export function checkSuggestions(data, pantry) {
@@ -64,17 +72,7 @@ export function checkSuggestions(data, pantry) {
     return [];
   }
 
-  pantry = pantry.filter((item) => typeof item === "string");
-
-  const cleanedPantry = pantry
-    .map((item) => item.trim().replace(/[<>]/g, " "))
-    .filter((item) => item.length > 0)
-    .reduce((unique, item) => {
-      if (!unique.some((existing) => sameIngredient(existing, item))) {
-        unique.push(item);
-      }
-      return unique;
-    }, []);
+  const cleanedPantry = cleanPantry(pantry);
 
   const validRecipes = data.recipes.filter((recipe) => {
     if (
@@ -99,7 +97,7 @@ export function checkSuggestions(data, pantry) {
       const trimmedIng = ing.trim();
       return (
         cleanedPantry.some((pantryItem) => sameIngredient(pantryItem, trimmedIng)) ||
-        BASICS.some((basic) => sameIngredient(basic, trimmedIng))
+        BASICS.includes(cleanIngredient(trimmedIng))
       );
     });
 
@@ -107,20 +105,17 @@ export function checkSuggestions(data, pantry) {
       return typeof step === "string" && step.trim().length > 0 && step.trim().length <= 200;
     });
 
-    if (!allIngredientsValid || !allStepsValid) {
-      return false;
-    }
+    
 
-    return allIngredientsValid;
+    return allIngredientsValid && allStepsValid;
 
     
   });
 
   return validRecipes.slice(0, 3).map((recipe) => ({
     name: recipe.name.trim(),
-    ingredients: recipe.ingredients.map((ing) => ing.trim()).filter((ing) => ing.length > 0),
-    steps: recipe.steps.map((step) => step.trim()).filter((step) => step.length > 0),
+    ingredients: recipe.ingredients.map((ing) => ing.trim()),
+    steps: recipe.steps.map((step) => step.trim()),
   }));
-
 
 }

@@ -4,9 +4,16 @@
 // ingredients: array of strings, e.g. ["egg", "  Cheese "]
 // recipes: array of { name: string, ingredients: string[] }
 
+
+
+export function cleanIngredient(ingredient) {
+  return ingredient.trim().toLowerCase().replace(/\s+/g, ' ');
+} 
+
+
 export function sameIngredient(a, b) {
-  const x = a.trim().toLowerCase().replace(/\s+/g, ' ');
-  const y = b.trim().toLowerCase().replace(/\s+/g, ' ');
+  const x = cleanIngredient(a);
+  const y = cleanIngredient(b);
 
 
   return x === y || x === y + 's' || x === y + 'es' || y === x + 's' || y === x + 'es';
@@ -14,9 +21,9 @@ export function sameIngredient(a, b) {
 
 
 export function matchRecipes(ingredients, recipes) {
-  const cleanedIngredients = ingredients.map((s) => s.trim().toLowerCase().replace(/\s+/g, ' '));
+  const cleanedIngredients = ingredients.map((s) => cleanIngredient(s));
   const matchedRecipes = recipes.filter((recipe) => {
-    const recipeIngredients = recipe.ingredients.map((s) => s.trim().toLowerCase().replace(/\s+/g, ' '));
+    const recipeIngredients = recipe.ingredients.map((s) => cleanIngredient(s));
     return recipeIngredients.some((ing) => cleanedIngredients.some((cleanedIng) => sameIngredient(ing, cleanedIng)));
   });
   matchedRecipes.sort((a, b) => {

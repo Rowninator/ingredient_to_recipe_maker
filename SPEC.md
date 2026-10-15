@@ -18,10 +18,10 @@ Pantry Match can only suggest its 20 built-in recipes. Level 3 adds a **"Suggest
 ## How a request flows
 1. **Browser (`index.html`).** On tap, it sends `POST <PROXY_URL>` with the body `{"pantry": ["eggs", "cheese"]}`. Nothing else is sent: no prompt and no key.
 2. **Worker (`worker/`).**
-   1. Answers `OPTIONS` (CORS preflight) and returns 403 if `Origin` isn't one of the allowed sites (`https://rowninator.github.io` and `http://localhost:3000`).
+   1. Answers `OPTIONS` (CORS preflight) and returns 403 if `Origin` isn't an allowed site: `https://rowninator.github.io`, plus `DEV_ORIGIN` (`http://localhost:3000`) only when it's set in `worker/.dev.vars` for `wrangler dev`. It is never set on the deployed Worker.
    2. Applies the rate limit: **5 requests per 60 seconds per IP**, keyed on `CF-Connecting-IP`, using Cloudflare's Rate Limiting binding. Over the limit it returns 429.
-   3. Checks the body: `pantry` must be an array of 1–40 strings, each at most 40 characters. Otherwise it returns 400.
-   4. Calls `buildPrompt(pantry)` (written by the learner), then Gemini using the official `@google/genai` SDK: model `gemini-3.8-flash`, `system` as the system instruction, `user` as the content, JSON output with a schema matching the shape below, at most 2048 output tokens, and **thinking level `low`**. That model supports low, medium and high, and `minimal` returns an error. Thinking tokens count toward the output limit. The key comes from `env.GEMINI_API_KEY`. The call has a **15-second time limit** and no automatic retry, because tapping again is the retry. (The exact SDK option names get confirmed against Google's docs in step 5.)
+   3. Checks the body: `pantry` must be an array of 1–40 strings, each at most 40 characters with no commas (the prompt separates items with commas, and the page's `parse.js` already splits on them). Otherwise it returns 400.
+   4. Calls `buildPrompt(pantry)` (written by the learner), then Gemini using the official `@google/genai` SDK: model `gemini-3.8-flash`, `system` as the system instruction, `user` as the content, JSON output with a schema matching the shape below (the schema also sets 2–12 ingredients and 3–6 steps with `minItems`/`maxItems`; Gemini doesn't support `maxLength`, so the character limits stay in the system text and `checkSuggestions`), at most 2048 output tokens, and **thinking level `low`**. That model supports low, medium and high, and `minimal` returns an error. Thinking tokens count toward the output limit. The key comes from `env.GEMINI_API_KEY`. The call has a **15-second time limit** and no automatic retry, because tapping again is the retry. (The exact SDK option names get confirmed against Google's docs in step 5.)
    5. Turns the result into one of these responses. It never passes Gemini's raw reply through, and the error body never includes its text or any error details from Google.
       - Timed out → `504 {"error": "timeout"}`.
       - Gemini's free quota is used up (Gemini 429 `RESOURCE_EXHAUSTED`) → `503 {"error": "quota"}`. This is a different status from the Worker's own 429, so the page can tell them apart.
@@ -55,7 +55,7 @@ The AI's reply text, which is also the Worker's 200 response:
   - Returns `[]` if `data` isn't an object with a `recipes` array.
   - Keeps a recipe only if all of these hold:
     - `name` is a non-blank string of at most 60 characters.
-    - `ingredients` is 2–12 non-blank strings, and every one matches a pantry item or a basic (via `sameIngredient`).
+    - `ingredients` is 2–12 non-blank strings, and every one matches a pantry item (via `sameIngredient`) or exactly matches a basic after trimming, lowercasing and collapsing spaces (no plural rule, so `peppers` isn't the basic `pepper`).
     - `steps` is 3–6 non-blank strings, each at most 200 characters.
   - Trims every string, keeps at most 3 recipes, and doesn't change `data`.
 
