@@ -25,6 +25,7 @@ Pantry Match can only suggest its 20 built-in recipes. Level 3 adds a **"Suggest
    5. Turns the result into one of these responses. It never passes Gemini's raw reply through, and the error body never includes its text or any error details from Google.
       - Timed out → `504 {"error": "timeout"}`.
       - Gemini's free quota is used up (Gemini 429 `RESOURCE_EXHAUSTED`) → `503 {"error": "quota"}`. This is a different status from the Worker's own 429, so the page can tell them apart.
+      - Gemini is busy (Gemini 503 `UNAVAILABLE`, a temporary error) → `503 {"error": "busy"}`. No automatic retry; tapping again is the retry.
       - Any other Gemini error, a `finishReason` other than `STOP` (for example `MAX_TOKENS` or `SAFETY`), or no text → `502 {"error": "bad_reply"}`.
       - Otherwise the Worker passes **only the reply text** to `readReply(text, pantry)` in `reply.js` (written by Claude, shared and tested with saved replies). So `reply.js`, its tests and the page don't depend on the provider. Only the Worker does:
         - Text that isn't valid JSON → `502 {"error": "bad_reply"}`.
@@ -77,7 +78,7 @@ No test calls the real API. `fixtures/replies/*.txt` holds the reply **text only
 
 `suggest.test.js` also runs `checkSuggestions` on the parsed text of good / wrong-shape / missing-fields / off-pantry. The exact limits stay as inline tests.
 
-Checking Gemini's `finishReason` (for example `MAX_TOKENS` or `SAFETY`) and its quota error happens in the Worker, because those are provider-specific. They're tested by hand in step 5. The rest of the Worker (CORS, Origin, rate limit, SDK call, time-outs) is also tested by hand (`wrangler dev` plus the Browser pane), not in `npm test`. That keeps the root project free of dependencies.
+Checking Gemini's `finishReason` (for example `MAX_TOKENS` or `SAFETY`) and its quota and busy errors happen in the Worker, because those are provider-specific. They're tested by hand in step 5. The rest of the Worker (CORS, Origin, rate limit, SDK call, time-outs) is also tested by hand (`wrangler dev` plus the Browser pane), not in `npm test`. That keeps the root project free of dependencies.
 
 ## Page changes (`index.html`)
 - Adds a new section, "AI ideas", under Top recipes, with a **"Suggest with AI"** button. The button is disabled when the pantry is empty.
@@ -104,6 +105,7 @@ Every outcome ends with a message or cards in the AI section, never a blank sect
 | Took too long | Worker 504, or the browser's 20-second abort fires | "That took too long. Try again in a moment." |
 | Rate limited | 429 | "Too many requests. Wait a minute, then try again." |
 | Free AI limit used up | Worker 503 `quota` | "The free AI limit is used up for now. Try again later." |
+| AI busy | Worker 503 `busy` | "The AI is busy right now. Try again in a minute." |
 | Bad request | 400 (shouldn't happen from the real page) | "Couldn't get suggestions right now." |
 | Wrong site | Worker 403. It has no CORS headers, so the browser hides it and `fetch` rejects like a network error. Only happens from a site that isn't allowed | "Can't reach the AI right now. Check your connection." |
 | Offline or network error | `fetch` rejects (not an abort) | "Can't reach the AI right now. Check your connection." |

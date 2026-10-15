@@ -89,6 +89,9 @@ export default {
       if (error?.status === 429) {
         return json(503, { error: "quota" }, origin);
       }
+      if (error?.status === 503) {
+        return json(503, { error: "busy" }, origin);
+      }
       console.log("Gemini error", error?.status ?? error?.name);
       return json(502, { error: "bad_reply" }, origin);
     }
