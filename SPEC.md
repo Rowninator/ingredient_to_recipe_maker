@@ -104,7 +104,8 @@ Every outcome ends with a message or cards in the AI section, never a blank sect
 | Took too long | Worker 504, or the browser's 20-second abort fires | "That took too long. Try again in a moment." |
 | Rate limited | 429 | "Too many requests. Wait a minute, then try again." |
 | Free AI limit used up | Worker 503 `quota` | "The free AI limit is used up for now. Try again later." |
-| Bad request or wrong site | 400 or 403 (shouldn't happen from the real page) | "Couldn't get suggestions right now." |
+| Bad request | 400 (shouldn't happen from the real page) | "Couldn't get suggestions right now." |
+| Wrong site | Worker 403. It has no CORS headers, so the browser hides it and `fetch` rejects like a network error. Only happens from a site that isn't allowed | "Can't reach the AI right now. Check your connection." |
 | Offline or network error | `fetch` rejects (not an abort) | "Can't reach the AI right now. Check your connection." |
 | Any other status | anything else | "Couldn't get suggestions right now." |
 
