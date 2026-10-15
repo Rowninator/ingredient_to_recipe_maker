@@ -106,6 +106,7 @@
       color: var(--brand-ink);
       font-weight: 600;
     }
+    .btn:disabled { opacity: .55; cursor: default; }
     .hint { margin: 6px 2px 0; font-size: .8rem; color: var(--muted); }
 
     .section-head {
@@ -157,6 +158,15 @@
     .empty p { margin: 0 auto 16px; color: var(--muted); max-width: 30ch; }
     .empty .chips { justify-content: center; }
 
+    .ai-btn { width: 100%; }
+    .ai-msg { margin: 16px 2px 0; text-align: center; color: var(--muted); }
+    #ai-results .cards { margin-top: 12px; }
+    .ai-card { overflow-wrap: anywhere; } /* AI text can hold long unbroken words */
+    .ai-label { margin: 0 0 4px; font-size: .75rem; font-weight: 600; color: var(--muted); }
+    .ai-card .ings { margin-top: 10px; }
+    .steps { margin: 12px 0 0; padding-left: 1.4em; }
+    .steps li { margin-top: 4px; }
+
     .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
   </style>
 </head>
@@ -189,6 +199,13 @@
         <div class="section-head"><h2 id="results-title">Top recipes</h2></div>
         <div id="results" aria-live="polite"></div>
       </section>
+
+      <section>
+        <div class="section-head"><h2>AI ideas</h2></div>
+        <button class="btn ai-btn" id="ai-btn" type="button" aria-busy="false">Suggest with AI</button>
+        <p class="hint">Sends your pantry list to Google Gemini.</p>
+        <div id="ai-results" aria-live="polite"></div>
+      </section>
     </main>
   </div>
 
@@ -197,12 +214,30 @@
     import { recipes } from "./recipes.js";
     import { parseIngredients } from "./parse.js";
     import { savePantry, loadPantry } from "./pantry.js";
+    import { checkSuggestions } from "./suggest.js";
+
+    // The AI proxy (worker/). Local for now; step 8 of SPEC.md points this at
+    // the deployed Worker. The address is public, the key is not in it.
+    const PROXY_URL = "http://localhost:8787";
+    // Longer than the Worker's 15 s limit, so its own 504 usually arrives first.
+    const AI_TIMEOUT_MS = 20000;
+    const AI_MESSAGES = {
+      none: "No ideas fit your pantry this time. Try again, or add a few more ingredients.",
+      garbled: "The AI's answer came back garbled. Try again.",
+      timeout: "That took too long. Try again in a moment.",
+      rateLimited: "Too many requests. Wait a minute, then try again.",
+      quota: "The free AI limit is used up for now. Try again later.",
+      offline: "Can't reach the AI right now. Check your connection.",
+      failed: "Couldn't get suggestions right now.",
+    };
 
     const form = document.getElementById("add-form");
     const input = document.getElementById("ing-input");
     const pantry = document.getElementById("pantry");
     const chipsEl = document.getElementById("chips");
     const results = document.getElementById("results");
+    const aiBtn = document.getElementById("ai-btn");
+    const aiResults = document.getElementById("ai-results");
 
     // Some private-browsing modes throw just for reading localStorage; then the page works without saving.
     let storage = null;
@@ -214,7 +249,9 @@
 
     // The only place the pantry changes, so every change is saved.
     function setPantry(next) {
+      const changed = next.length !== have.length || next.some((name, i) => name !== have[i]);
       have = next;
+      if (changed) resetAi();
       if (storage) {
         savedNote.textContent = savePantry(storage, have) ? "Saved on this device" : "Couldn't save on this device";
       }
@@ -279,8 +316,103 @@
       ]);
     }
 
+    // --- AI ideas ---
+
+    // aiRun goes up on every request and every pantry change, so a reply that
+    // arrives after the pantry changed is ignored.
+    let aiRun = 0;
+    let aiController = null;
+    let aiBusy = false;
+
+    function setAiBusy(busy) {
+      aiBusy = busy;
+      aiBtn.textContent = busy ? "Thinking…" : "Suggest with AI";
+      aiBtn.setAttribute("aria-busy", String(busy));
+      aiBtn.disabled = busy || have.length === 0;
+    }
+
+    // The AI cards no longer match a changed pantry: drop them and any request.
+    function resetAi() {
+      aiRun++;
+      aiController?.abort();
+      aiController = null;
+      setAiBusy(false);
+      aiResults.replaceChildren();
+    }
+
+    function aiMessage(text) {
+      return el("p", { className: "ai-msg", textContent: text });
+    }
+
+    function aiCard(recipe) {
+      return el("article", { className: "card ai-card" }, [
+        el("p", { className: "ai-label", textContent: "AI suggestion · check before cooking" }),
+        el("h3", { textContent: recipe.name }),
+        el("ul", { className: "ings" }, recipe.ingredients.map((i) => el("li", { textContent: i }))),
+        el("ol", { className: "steps" }, recipe.steps.map((s) => el("li", { textContent: s }))),
+      ]);
+    }
+
+    // Turns the Worker's response into recipes (an array) or an AI_MESSAGES key.
+    async function readAiResponse(response, sent) {
+      if (response.status === 200) {
+        let body;
+        try {
+          body = await response.json();
+        } catch (error) {
+          if (error.name === "AbortError") throw error;
+          return "garbled";
+        }
+        // Second check in case the proxy is ever wrong.
+        const recipes = checkSuggestions(body, sent);
+        return recipes.length > 0 ? recipes : "none";
+      }
+      if (response.status === 502) return "garbled";
+      if (response.status === 504) return "timeout";
+      if (response.status === 429) return "rateLimited";
+      if (response.status === 503) {
+        const body = await response.json().catch(() => null);
+        if (body?.error === "quota") return "quota";
+      }
+      return "failed";
+    }
+
+    async function suggestWithAi() {
+      if (aiBusy || have.length === 0) return;
+      const run = ++aiRun;
+      const sent = [...have];
+      const controller = new AbortController();
+      aiController = controller;
+      const timer = setTimeout(() => controller.abort(), AI_TIMEOUT_MS);
+      setAiBusy(true);
+      aiResults.replaceChildren(aiMessage("Asking the AI for ideas… this can take up to 20 seconds"));
+
+      let outcome;
+      try {
+        const response = await fetch(PROXY_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ pantry: sent }),
+          signal: controller.signal,
+        });
+        outcome = await readAiResponse(response, sent);
+      } catch (error) {
+        outcome = error.name === "AbortError" ? "timeout" : "offline";
+      } finally {
+        clearTimeout(timer);
+      }
+
+      if (run !== aiRun) return; // the pantry changed; resetAi already tidied up
+      aiController = null;
+      setAiBusy(false);
+      aiResults.replaceChildren(Array.isArray(outcome)
+        ? el("div", { className: "cards" }, outcome.map(aiCard))
+        : aiMessage(AI_MESSAGES[outcome]));
+    }
+
     function render() {
       pantry.hidden = have.length === 0;
+      aiBtn.disabled = aiBusy || have.length === 0;
       chipsEl.replaceChildren(...have.map((name) =>
         el("button", { type: "button", className: "chip", ariaLabel: `Remove ${name}`, onclick: () => remove(name) }, [
           name,
@@ -317,6 +449,8 @@
       setPantry([]);
       input.focus();
     });
+
+    aiBtn.addEventListener("click", suggestWithAi);
 
     render();
   </script>
