@@ -9,6 +9,10 @@ import { readReply } from "../../reply.js";
 const MODEL = "gemini-3.8-flash";
 const PROD_ORIGIN = "https://rowninator.github.io";
 const TIMEOUT_MS = 15000;
+// Gemini's 503 (busy) is temporary, so it gets up to 2 retries with a short
+// backoff (0.5-1 s, then 1-2 s). TIMEOUT_MS still covers the whole call.
+// 429 (quota) is not retried: waiting a few seconds won't refill it.
+const RETRY_OPTIONS = { attempts: 3, initialDelay: 0.5, maxDelay: 2, httpStatusCodes: [503] };
 
 // What Gemini must reply with: the "Shapes" section of SPEC.md.
 const RECIPES_SCHEMA = {
@@ -68,7 +72,7 @@ export default {
     const signal = AbortSignal.timeout(TIMEOUT_MS);
     let response;
     try {
-      const ai = new GoogleGenAI({ apiKey: env.GEMINI_API_KEY });
+      const ai = new GoogleGenAI({ apiKey: env.GEMINI_API_KEY, httpOptions: { retryOptions: RETRY_OPTIONS } });
       response = await ai.models.generateContent({
         model: MODEL,
         contents: prompt.user,

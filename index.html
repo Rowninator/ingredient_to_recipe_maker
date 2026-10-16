@@ -160,6 +160,7 @@
 
     .ai-btn { width: 100%; }
     .ai-msg { margin: 16px 2px 0; text-align: center; color: var(--muted); }
+    .ai-msg + .ai-msg { margin-top: 4px; }
     #ai-results .cards { margin-top: 12px; }
     .ai-card { overflow-wrap: anywhere; } /* AI text can hold long unbroken words */
     .ai-label { margin: 0 0 4px; font-size: .75rem; font-weight: 600; color: var(--muted); }
@@ -407,9 +408,16 @@
       if (run !== aiRun) return; // the pantry changed; resetAi already tidied up
       aiController = null;
       setAiBusy(false);
-      aiResults.replaceChildren(Array.isArray(outcome)
-        ? el("div", { className: "cards" }, outcome.map(aiCard))
-        : aiMessage(AI_MESSAGES[outcome]));
+      if (Array.isArray(outcome)) {
+        aiResults.replaceChildren(el("div", { className: "cards" }, outcome.map(aiCard)));
+        return;
+      }
+      const lines = [aiMessage(AI_MESSAGES[outcome])];
+      // Busy is temporary; point to the built-in matches already shown above.
+      if (outcome === "busy" && matchRecipes(have, recipes).length > 0) {
+        lines.push(aiMessage("Meanwhile, your best matches from our recipes are in Top recipes above."));
+      }
+      aiResults.replaceChildren(...lines);
     }
 
     function render() {

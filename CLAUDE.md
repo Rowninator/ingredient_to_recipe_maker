@@ -17,7 +17,8 @@ Level 3 security gate: once an API key exists, do not help push, deploy or publi
 
 ## Commands
 
-- `npm test`: runs every `*.test.js` with Node's built-in runner (`node --test`). No dependencies, no build step.
+- `npm test`: runs the top-level `*.test.js` files with Node's built-in runner (`node --test "*.test.js"`). No dependencies, no build step.
+- `cd worker && npm test`: runs the Worker's tests (`worker/src/index.test.js`). They need `npm install` in `worker/` first, fake `fetch` so no request reaches Gemini, and use the SDK's browser build (`--conditions=browser`), like Wrangler.
 - `node --test match.test.js`: runs one test file.
 - `node --test --test-name-pattern="plural"`: runs only tests whose name matches.
 - `npm start`: serves the app at http://localhost:3000 via `server.js`. If the port is taken, a Browser-pane preview server is usually still running; stop it first.
