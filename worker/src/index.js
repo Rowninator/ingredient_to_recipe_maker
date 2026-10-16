@@ -6,7 +6,7 @@ import { GoogleGenAI, ThinkingLevel, FinishReason } from "@google/genai";
 import { buildPrompt } from "../../suggest.js";
 import { readReply } from "../../reply.js";
 
-const MODEL = "gemini-3.8-flash";
+const MODEL = "gemini-3.5-flash-lite";
 const PROD_ORIGIN = "https://rowninator.github.io";
 const TIMEOUT_MS = 15000;
 // Gemini's 503 (busy) is temporary, so it gets up to 2 retries with a short
