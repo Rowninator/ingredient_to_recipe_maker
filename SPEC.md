@@ -84,7 +84,7 @@ Checking Gemini's `finishReason` (for example `MAX_TOKENS` or `SAFETY`) and its 
 - Adds a new section, "AI ideas", under Top recipes, with a **"Suggest with AI"** button. The button is disabled when the pantry is empty.
 - AI cards look like the recipe cards and show numbered steps, with a small "AI suggestion · check before cooking" label.
 - Under the button, a line in small muted text: "Sends your pantry list to Google Gemini."
-- The proxy address is a `PROXY_URL` constant in `index.html`. The address is public and fine to commit; the key is not.
+- The proxy address is `PROXY_URL` in `index.html`: the deployed Worker `https://pantry-match-ai.rowninator.workers.dev` when the page runs on `https://rowninator.github.io`, otherwise the local Worker `http://localhost:8787`. Both addresses are public and fine to commit; the key is not.
 
 ### Loading state
 - On tap, the button changes to **"Thinking…"**, is disabled, and gets `aria-busy="true"`, so a second tap does nothing.

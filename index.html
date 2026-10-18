@@ -217,9 +217,12 @@
     import { savePantry, loadPantry } from "./pantry.js";
     import { checkSuggestions } from "./suggest.js";
 
-    // The AI proxy (worker/). Local for now; step 8 of SPEC.md points this at
-    // the deployed Worker. The address is public, the key is not in it.
-    const PROXY_URL = "http://localhost:8787";
+    // The AI proxy (worker/): the deployed Worker on the live site, otherwise
+    // the local one from `wrangler dev`. Both addresses are public; the key is
+    // in neither.
+    const PROXY_URL = location.origin === "https://rowninator.github.io"
+      ? "https://pantry-match-ai.rowninator.workers.dev"
+      : "http://localhost:8787";
     // Longer than the Worker's 15 s limit, so its own 504 usually arrives first.
     const AI_TIMEOUT_MS = 20000;
     const AI_MESSAGES = {
