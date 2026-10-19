@@ -72,8 +72,7 @@ export default {
     const signal = AbortSignal.timeout(TIMEOUT_MS);
     let response;
     try {
-      const ai = new GoogleGenAI({ apiKey: env.GEMINI_API_KEY, httpOptions: { retryOptions: RETRY_OPTIONS } });
-      response = await ai.models.generateContent({
+      response = await getClient(env).models.generateContent({
         model: MODEL,
         contents: prompt.user,
         config: {
@@ -107,6 +106,18 @@ export default {
     return json(status, body, origin);
   },
 };
+
+// One Gemini client per Worker instance, reused across requests. It's rebuilt
+// only if the key changes (a new secret, or a different key in a test).
+let client = null;
+let clientKey = null;
+function getClient(env) {
+  if (client === null || clientKey !== env.GEMINI_API_KEY) {
+    client = new GoogleGenAI({ apiKey: env.GEMINI_API_KEY, httpOptions: { retryOptions: RETRY_OPTIONS } });
+    clientKey = env.GEMINI_API_KEY;
+  }
+  return client;
+}
 
 // DEV_ORIGIN is set only in worker/.dev.vars, so the deployed Worker
 // allows just the live site.
