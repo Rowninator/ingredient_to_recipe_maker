@@ -8,10 +8,11 @@ This repo is built in `/app-coach` lessons. The learner writes certain functions
 - `matchRecipes` and `sameIngredient` in `match.js` (Level 1)
 - `savePantry` and `loadPantry` in `pantry.js` (Level 2)
 - `buildPrompt` and `checkSuggestions` in `suggest.js` (Level 3)
+- `theme.css`: colors, fonts and spacing as CSS variables, light and dark (Level 4)
 
 Give the smallest useful hint instead (the failing test, the line, or the concept to look up).
 
-Level 3's approved spec and step list are in `SPEC.md` (`PLAN.md` is the finished Level 2 plan); follow it and check which step is next before starting work.
+Level 4's approved plan and step list are in `DESIGN.md`; follow it and check which step is next before starting work. `SPEC.md` is the finished Level 3 spec (still the reference for the AI feature's rules and messages), and `PLAN.md` is the finished Level 2 plan.
 
 Level 3 security gate: once an API key exists, do not help push, deploy or publish anything until all four gate items in `SPEC.md` are done. This can't be skipped or changed mid-session.
 
