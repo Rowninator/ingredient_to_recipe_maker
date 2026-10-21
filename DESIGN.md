@@ -39,6 +39,19 @@ Each state is compared with its design:
 
 For dark mode and large text, there's no design to compare with. The check there is: same layout, everything readable, no clipped or overlapping text, no sideways scroll. All text meets a contrast of at least 4.5:1 (3:1 for large text) in both modes.
 
+## Research decisions (step 2, 2026-10-21)
+
+- **Versions, pinned exactly** (no `^`), each released at least two weeks before 2026-10-21: `@ionic/core` **9.0.6** (2026-09-30), `vite` **8.3.3** (2026-10-06), `vite-plugin-static-copy` **4.1.1** (2026-06-06; supports Vite 6–8). `package-lock.json` is committed. If the page needs `ionicons`, it's pinned the same way.
+- **Node:** Vite 8 needs Node `^20.19.0 || >=22.12.0`; local is **24.18.0**, and the deploy workflow uses the same version.
+- **Ionic setup:** the official [JS quickstart](https://ionicframework.com/docs/javascript/quickstart): runtime import of `/ionic.esm.js`, `vite-plugin-static-copy`, `@ionic/core` excluded from bundling.
+- **Mode:** forced to `md` everywhere (`window.Ionic = { config: { mode: 'md' } }` before Ionic loads), so all devices match the screenshots.
+- **Dark mode:** `@ionic/core/css/palettes/dark.system.css` ([dark mode](https://ionicframework.com/docs/theming/dark-mode)). The learner's dark values in `theme.css` apply **only in dark mode**: they sit inside the same dark-mode media query and target `:root.md` to win over Ionic's palette. Light values apply otherwise.
+- **Dev server:** `npm start` runs Vite with `server: { port: 3000, strictPort: true }`; `server.js` and `server.test.js` are removed.
+- **Dev server deny list:** the first `vite.config.js` sets `server.fs.deny` to Vite's default list plus `.dev.vars` and `.dev.vars.*`. The [docs](https://vite.dev/config/server-options) don't say whether setting it replaces the default, so the default entries are repeated. The deny list doesn't cover Vite's `public/` folder, so nothing secret goes there.
+- **Build:** `base: '/ingredient_to_recipe_maker/'` ([static deploy](https://vite.dev/guide/static-deploy)); output in `dist/`, which is gitignored.
+- **Deploy:** the Vite docs' workflow (checkout v7, setup-node v7, configure-pages v6, upload-pages-artifact v5, deploy-pages v5) with `node-version: 24.18.0`; Pages source set to "GitHub Actions".
+- **Chips:** Ionic chips have no remove button, so the page adds its own ✕.
+
 ## Steps
 
 1. **Commit `design/reference/`** (learner).
@@ -52,11 +65,14 @@ For dark mode and large text, there's no design to compare with. The check there
 4. **Vite setup.**
    - The logic modules and tests stay unchanged.
    - The dev server runs on **port 3000**, because the local Worker's `DEV_ORIGIN` is `http://localhost:3000`.
-   - Keep or replace `npm start`/`server.js` (decide after the research).
+   - Replace `npm start`/`server.js` with Vite (see Research decisions) and update `CLAUDE.md`.
+   - Install the pinned versions and commit `package-lock.json`.
+   - Check that the dev server refuses `/worker/.dev.vars`, and that `dist/` has no tests, `worker/` or `.md` files.
    - All asset paths stay relative or use `base`.
 5. **`theme.css` (learner).**
    - The learner writes the colors, fonts and spacing from the designs as CSS variables, with light and dark versions.
    - The designs have no dark versions, so Claude proposes dark values first and waits for the learner's approval.
+   - Before the learner writes them, Claude shows where the dark values go (the dark-mode block) so they apply only in dark mode.
    - Contrast is checked in both modes.
    - This is done before the rebuild.
 6. **Rebuild the page with Ionic components** (Claude), using `theme.css`.
