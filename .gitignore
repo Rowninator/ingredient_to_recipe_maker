@@ -1,5 +1,8 @@
 node_modules/
 
+# Vite's build output (deployed by GitHub Actions, never committed)
+dist/
+
 # Worker secrets for `wrangler dev` (the Gemini key). Never commit these.
 worker/.dev.vars
 worker/.dev.vars.*

@@ -1,7 +1,8 @@
 {
   "version": "0.0.1",
   "configurations": [
-    { "name": "pantry-match", "runtimeExecutable": "node", "runtimeArgs": ["server.js"], "port": 3000 },
+    { "name": "pantry-match", "runtimeExecutable": "npm", "runtimeArgs": ["start"], "port": 3000 },
+    { "name": "pantry-match-built", "runtimeExecutable": "npm", "runtimeArgs": ["run", "preview"], "port": 3000 },
     { "name": "worker", "runtimeExecutable": "node", "runtimeArgs": ["worker/node_modules/wrangler/bin/wrangler.js", "dev", "--config", "worker/wrangler.jsonc", "--port", "8787", "--ip", "127.0.0.1"], "port": 8787 }
   ]
 }

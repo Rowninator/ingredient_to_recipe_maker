@@ -18,18 +18,20 @@ Level 3 security gate: once an API key exists, do not help push, deploy or publi
 
 ## Commands
 
-- `npm test`: runs the top-level `*.test.js` files with Node's built-in runner (`node --test "*.test.js"`). No dependencies, no build step.
+- `npm test`: runs the top-level `*.test.js` files with Node's built-in runner (`node --test "*.test.js"`). The tests need no build step.
 - `cd worker && npm test`: runs the Worker's tests (`worker/src/index.test.js`). They need `npm install` in `worker/` first, fake `fetch` so no request reaches Gemini, and use the SDK's browser build (`--conditions=browser`), like Wrangler.
 - `node --test match.test.js`: runs one test file.
 - `node --test --test-name-pattern="plural"`: runs only tests whose name matches.
-- `npm start`: serves the app at http://localhost:3000 via `server.js`. If the port is taken, a Browser-pane preview server is usually still running; stop it first.
+- `npm start`: runs Vite's dev server at http://localhost:3000/ingredient_to_recipe_maker/. The port is fixed (`strictPort`) because the local Worker's `DEV_ORIGIN` is `http://localhost:3000`. If the port is taken, a Browser-pane preview server is usually still running; stop it first.
+- `npm run build`: builds the site into `dist/` (gitignored).
+- `npm run preview`: serves `dist/` on port 3000 too, so the built site can call the local Worker.
 
 ## Architecture
 
 - Plain ES modules (`"type": "module"`) shared by Node tests and the browser, so `match.js`, `parse.js`, `recipes.js`, `pantry.js`, `suggest.js` and `reply.js` must not use Node-only or browser-only APIs. `reply.js` (`readReply`, written by Claude) turns the AI's reply text (from Gemini, via the Worker) into the Worker's status and body. It only sees text, so it doesn't depend on the provider. Its tests use the saved replies in `fixtures/replies/`, so no test calls the real API. `pantry.js` takes storage as a parameter (the page passes `localStorage`, or `null` if it's blocked; tests pass a fake).
 - The pantry is saved as JSON under the localStorage key `"pantry-match:pantry"`. In `index.html`, every change goes through `setPantry(next)`, which saves and re-renders; don't assign `have` anywhere else.
 - `index.html` is the whole UI ("Pantry Match"): CSS and an inline `<script type="module">` that imports the modules above. Build DOM with `textContent` (via its `el()` helper), never `innerHTML`, since ingredient names are user input. The "AI ideas" section posts the pantry to `PROXY_URL` (the deployed Worker at `pantry-match-ai.rowninator.workers.dev` on `rowninator.github.io`, otherwise the local one), re-checks the reply with `checkSuggestions`, and maps each outcome to a message in `AI_MESSAGES` (the "What the user sees" table in `SPEC.md`). `resetAi()` runs on every pantry change and makes a reply that arrives late get ignored.
-- `server.js` exists only because browsers block module imports from `file://`. It listens on 127.0.0.1 only, refuses any path with a part starting with `.` (`isHiddenPath`, tested in `server.test.js`), and starts only when run directly, so tests can import it. The live site is GitHub Pages serving `main` from the repo root (https://rowninator.github.io/ingredient_to_recipe_maker/), so keep all imports and asset paths relative (`./match.js`).
+- `vite.config.js` sets `base` to `/ingredient_to_recipe_maker/`, the fixed port 3000, a `server.fs.deny` list that adds `.dev.vars`, `.claude/` and `.wrangler/` to Vite's defaults, and copies Ionic's runtime files into the build (Ionic's JS quickstart). Package versions are pinned exactly, and `package-lock.json` is committed. The live site is GitHub Pages serving `main` from the repo root (https://rowninator.github.io/ingredient_to_recipe_maker/), so keep all imports and asset paths relative (`./match.js`).
 
 ## Matching rules (locked in by `match.test.js`)
 
