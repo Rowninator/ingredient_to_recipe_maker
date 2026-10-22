@@ -39,6 +39,9 @@
   --pm-step-bg: #e8f1e8;
   --pm-step-num: #5f6a52;
 
+  /* Empty-state icon tile (the icon uses --pm-link) */
+  --pm-tile-bg: #deece0;
+
   /* Notes: info/busy, and save error (the error icon uses the error text colour) */
   --pm-note-bg: #eef5ee;
   --pm-note-text: #3c5a4e;
@@ -100,6 +103,8 @@
 
     --pm-step-bg: #243530;
     --pm-step-num: #c7d6b4;
+
+    --pm-tile-bg: #243530;
 
     --pm-note-bg: #18261f;
     --pm-note-text: #c6dccf;

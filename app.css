@@ -1,0 +1,175 @@
+/* Page layout and component styling. Colours, fonts and spacing come from
+   theme.css; this file is imported after it (and after Ionic's CSS). */
+
+ion-content { --background: var(--pm-bg); }
+
+.page {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: var(--pm-gutter) var(--pm-gutter) calc(var(--pm-gap-l) + env(safe-area-inset-bottom));
+}
+
+.visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* --- Header --- */
+ion-toolbar {
+  --background: var(--pm-header-bg);
+  --border-color: var(--pm-border);
+  --padding-start: var(--pm-gutter);
+  --padding-end: var(--pm-gutter);
+  --min-height: 64px;
+  border-bottom: 1px solid var(--pm-border);
+}
+.brand { display: flex; align-items: center; gap: var(--pm-gap-m); max-width: 480px; margin: 0 auto; }
+.logo {
+  display: grid; place-items: center; flex: none;
+  width: 36px; height: 36px; border-radius: 10px;
+  background: var(--pm-logo); color: var(--pm-logo-leaf);
+}
+.logo svg { width: 20px; height: 20px; }
+.brand h1 { margin: 0; font-size: 1.25rem; font-weight: 600; color: var(--pm-title); }
+
+/* --- Sections --- */
+section + section { margin-top: var(--pm-gap-l); }
+.section-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: var(--pm-gap-m); }
+h2 { margin: 0; font-size: 1.0625rem; font-weight: 700; color: var(--pm-text); }
+.hint { margin: 6px 0 0; font-size: .8125rem; color: var(--pm-muted); }
+.link-btn {
+  background: none; border: 0; padding: 8px 0 8px 12px; cursor: pointer;
+  font: inherit; font-size: .875rem; font-weight: 600; color: var(--pm-link);
+}
+
+/* --- Add row --- */
+/* At large text sizes the input needs more than the row can give, so the
+   button wraps below it instead of the placeholder being cut off. */
+.add-row { display: flex; flex-wrap: wrap; gap: var(--pm-gap-s); }
+.add-btn { flex: 1 0 auto; }
+.pm-input {
+  flex: 1000 1 11rem; min-width: 0; min-height: 48px;
+  border: 1px solid var(--pm-input-border);
+  border-radius: var(--pm-radius-control);
+  background: var(--pm-surface);
+  --color: var(--pm-text);
+  --placeholder-color: var(--pm-muted);
+  --placeholder-opacity: 1;
+  --padding-start: 14px;
+  --padding-end: 14px;
+  --highlight-height: 0;
+  font-size: max(16px, 1rem); /* at least 16px stops iPhones zooming in on focus; rem lets it grow with text size */
+}
+.pm-input:focus-within { outline: 2px solid var(--pm-primary); outline-offset: 1px; }
+
+ion-button {
+  --border-radius: var(--pm-radius-control);
+  --box-shadow: none;
+  --background: var(--pm-primary);
+  --color: var(--pm-on-primary);
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 600;
+  margin: 0;
+  min-height: 48px;
+}
+/* Disabled: a pale primary, as in the designs (Ionic's default is 50% opacity). */
+ion-button.button-disabled {
+  opacity: 1;
+  --background: color-mix(in srgb, var(--pm-primary) 30%, var(--pm-bg));
+  --color: color-mix(in srgb, var(--pm-on-primary) 85%, var(--pm-bg));
+}
+.add-btn { --padding-start: 20px; --padding-end: 20px; }
+.ai-btn { display: block; width: 100%; }
+.ai-hint { text-align: center; }
+.ai-btn ion-spinner { width: 18px; height: 18px; margin-right: 8px; color: currentColor; }
+
+/* --- Save note --- */
+.save-note {
+  display: flex; align-items: center; gap: 6px;
+  margin: var(--pm-gap-m) 0 0; font-size: .8125rem; color: var(--pm-muted-green);
+}
+.save-note svg { width: 14px; height: 14px; flex: none; }
+.save-note .icon-error { display: none; font-weight: 700; }
+.save-note.is-error {
+  padding: 10px 12px; border-radius: 10px;
+  background: var(--pm-error-bg); color: var(--pm-error-text);
+}
+.save-note.is-error .icon-ok { display: none; }
+.save-note.is-error .icon-error { display: inline; }
+
+/* --- Chips --- */
+.chips { display: flex; flex-wrap: wrap; gap: var(--pm-gap-s); }
+ion-chip.chip {
+  --background: var(--pm-chip-bg);
+  --color: var(--pm-chip-text);
+  margin: 0; min-height: 36px; padding: 0 6px 0 14px;
+  border: 1px solid var(--pm-border);
+  border-radius: var(--pm-radius-pill);
+  font-size: .875rem; font-weight: 600;
+}
+.chip-x {
+  display: grid; place-items: center; width: 28px; height: 28px; margin-left: 2px;
+  border: 0; border-radius: 50%; background: none; cursor: pointer;
+  font: inherit; font-size: 1.1rem; line-height: 1; color: var(--pm-chip-icon);
+}
+ion-chip.suggest { padding: 0; border-style: dashed; background: var(--pm-surface); --background: var(--pm-surface); }
+.chip-label {
+  border: 0; background: none; cursor: pointer; padding: 0 14px; min-height: 36px;
+  font: inherit; color: var(--pm-chip-text);
+}
+.chip-label::before { content: "+ "; }
+
+/* --- Cards --- */
+.cards { display: grid; gap: var(--pm-gap-m); }
+ion-card.card {
+  margin: 0;
+  background: var(--pm-surface);
+  border: 1px solid var(--pm-border);
+  border-radius: var(--pm-radius-card);
+  box-shadow: 0 1px 2px rgba(20, 40, 30, .05);
+  overflow-wrap: anywhere; /* AI text can hold long unbroken words */
+}
+ion-card.card ion-card-content { padding: var(--pm-card-pad); font-size: .8125rem; color: var(--pm-text-2); }
+/* "ion-card.card …" outranks Ionic's own ".card-content-md h3/p" rules. */
+ion-card.card p { margin: 0; font-size: .8125rem; line-height: 1.45; }
+ion-card.card .card-title { margin: 0 0 6px; font-size: 1rem; font-weight: 600; line-height: 1.3; color: var(--pm-text); }
+ion-card.card .count { color: var(--pm-count); font-weight: 600; }
+ion-card.card .count + p { margin-top: 6px; }
+.have::first-letter { text-transform: uppercase; }
+ion-card.card .missing { margin-top: 2px; color: var(--pm-muted); }
+
+ion-card.card .ai-label { margin-bottom: 8px; font-size: .75rem; font-weight: 600; color: var(--pm-muted-green); }
+ion-card.ai-card .card-title { font-size: 1.25rem; font-weight: 500; }
+.steps { list-style: none; margin: 12px 0 0; padding: 0; counter-reset: step; }
+.steps li { counter-increment: step; display: flex; gap: 10px; align-items: baseline; margin-top: 8px; font-size: .8125rem; color: var(--pm-text-2); }
+.steps li::before {
+  content: counter(step);
+  display: inline-grid; place-items: center; flex: none;
+  width: 20px; height: 20px; border-radius: 50%;
+  background: var(--pm-step-bg); color: var(--pm-step-num);
+  font-size: .6875rem; font-weight: 700;
+}
+
+/* --- Empty states --- */
+.empty {
+  padding: 28px 16px; text-align: center;
+  background: var(--pm-note-bg);
+  border: 1px dashed var(--pm-input-border);
+  border-radius: var(--pm-radius-card);
+}
+.empty-icon {
+  display: inline-grid; place-items: center; width: 44px; height: 44px;
+  border-radius: 12px; background: var(--pm-tile-bg); color: var(--pm-link);
+}
+.empty-icon svg { width: 22px; height: 22px; }
+.empty h3 { margin: 12px 0 6px; font-size: 1.0625rem; font-weight: 700; color: var(--pm-text); }
+.empty p { margin: 0 auto 16px; max-width: 32ch; font-size: .8125rem; color: var(--pm-muted); }
+.empty .chips { justify-content: center; }
+
+/* --- AI messages --- */
+.ai-msg { margin: 0; font-size: .875rem; color: var(--pm-note-text); }
+.ai-msg + .ai-msg { margin-top: 8px; }
+.ai-loading { margin: var(--pm-gap-m) 0 0; text-align: center; font-size: .8125rem; color: var(--pm-muted); }
+.note {
+  margin-top: var(--pm-gap-m); padding: 14px 16px;
+  background: var(--pm-note-bg); border: 1px solid var(--pm-border); border-radius: var(--pm-radius-card);
+}
+#ai-results .cards { margin-top: var(--pm-gap-m); }

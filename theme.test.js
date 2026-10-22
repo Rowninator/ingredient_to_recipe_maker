@@ -45,6 +45,7 @@ const PAIRS = [
   ["--ion-text-color", "--ion-background-color", TEXT, "Ionic default text"],
   ["--ion-color-primary-contrast", "--ion-color-primary", TEXT, "Ionic primary button text"],
   ["--pm-chip-icon", "--pm-chip-bg", NON_TEXT, "chip remove icon"],
+  ["--pm-link", "--pm-tile-bg", NON_TEXT, "empty-state icon"],
   ["--pm-input-border", "--pm-bg", NON_TEXT, "input border against the page"],
   ["--pm-input-border", "--pm-surface", NON_TEXT, "input border against the input"],
 ];

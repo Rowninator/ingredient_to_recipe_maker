@@ -79,6 +79,7 @@ For dark mode and large text, there's no design to compare with. The check there
 6. **Rebuild the page with Ionic components** (Claude), using `theme.css`.
    - Same ids, behavior, messages, `el()`/`textContent` (never `innerHTML`), and `setPantry` flow.
    - Run the screenshot checks above for every state, then fix the differences.
+   - Decided 2026-10-22: the header subtitle is dropped (not in the designs); icons are three inline SVGs (leaf, shield, basket) plus "×" text, so no `ion-icon` and no `svg/` copy; page CSS lives in `app.css`, imported after Ionic and `theme.css`; one style direction (no worktrees). Added `--pm-tile-bg` for the empty-state icon tile (measured `#deece0`; dark `#243530`). At large text sizes the Add button wraps below the input.
    - **Optional:** try two style directions in two git worktrees, compare their screenshots, keep one and delete the other.
 7. **Checkpoint.**
    - `npm test` and `cd worker && npm test`.

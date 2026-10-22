@@ -3,219 +3,95 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#2f7d4f">
+  <meta name="theme-color" content="#f6f7ef" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#151b19" media="(prefers-color-scheme: dark)">
   <title>Pantry Match</title>
-  <style>
-    :root {
-      --bg: #eef1ee;
-      --app: #fbfcfb;
-      --surface: #ffffff;
-      --text: #1d2420;
-      --muted: #5f6b64;
-      --line: #dfe5e1;
-      --brand: #2f7d4f;
-      --brand-ink: #ffffff;
-      --brand-soft: #e3f1e8;
-      --brand-soft-ink: #1f5a37;
-      --shadow: 0 1px 2px rgba(20, 40, 30, .06), 0 4px 14px rgba(20, 40, 30, .06);
-    }
-    @media (prefers-color-scheme: dark) {
-      :root:not([data-theme="light"]) {
-        --bg: #0d110f;
-        --app: #141a17;
-        --surface: #1c2420;
-        --text: #e7ece9;
-        --muted: #9aa8a0;
-        --line: #2b3530;
-        --brand: #5cbf84;
-        --brand-ink: #0d1a12;
-        --brand-soft: #1f3529;
-        --brand-soft-ink: #a6e3bd;
-        --shadow: 0 1px 2px rgba(0, 0, 0, .3);
-      }
-    }
-    :root[data-theme="dark"] {
-      --bg: #0d110f; --app: #141a17; --surface: #1c2420; --text: #e7ece9; --muted: #9aa8a0;
-      --line: #2b3530; --brand: #5cbf84; --brand-ink: #0d1a12; --brand-soft: #1f3529;
-      --brand-soft-ink: #a6e3bd; --shadow: 0 1px 2px rgba(0, 0, 0, .3);
-    }
-
-    * { box-sizing: border-box; }
-    html, body { margin: 0; }
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font: 16px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-      -webkit-tap-highlight-color: transparent;
-    }
-    button { font: inherit; color: inherit; cursor: pointer; }
-
-    /* The "phone": full screen on phones, a framed column on bigger screens. */
-    .app {
-      max-width: 440px;
-      min-height: 100vh;
-      min-height: 100dvh;
-      margin: 0 auto;
-      background: var(--app);
-      display: flex;
-      flex-direction: column;
-    }
-    @media (min-width: 600px) {
-      body { padding: 32px 16px; }
-      .app {
-        min-height: 760px;
-        border-radius: 32px;
-        border: 1px solid var(--line);
-        box-shadow: var(--shadow);
-        overflow: hidden;
-      }
-    }
-
-    header {
-      position: sticky;
-      top: 0;
-      z-index: 1;
-      background: var(--brand);
-      color: var(--brand-ink);
-      padding: calc(16px + env(safe-area-inset-top)) 16px 16px;
-    }
-    header h1 { margin: 0; font-size: 1.35rem; letter-spacing: -.01em; }
-    header p { margin: 2px 0 0; opacity: .85; font-size: .9rem; }
-
-    main { flex: 1; padding: 16px 16px calc(24px + env(safe-area-inset-bottom)); }
-
-    .add-row { display: flex; gap: 8px; }
-    .add-row input {
-      flex: 1;
-      min-width: 0;
-      height: 48px;
-      padding: 0 14px;
-      font-size: 16px; /* 16px stops iPhones zooming in on focus */
-      color: var(--text);
-      background: var(--surface);
-      border: 1px solid var(--line);
-      border-radius: 14px;
-    }
-    .add-row input:focus { outline: 2px solid var(--brand); outline-offset: -1px; border-color: transparent; }
-    .btn {
-      height: 48px;
-      padding: 0 18px;
-      border: 0;
-      border-radius: 14px;
-      background: var(--brand);
-      color: var(--brand-ink);
-      font-weight: 600;
-    }
-    .btn:disabled { opacity: .55; cursor: default; }
-    .hint { margin: 6px 2px 0; font-size: .8rem; color: var(--muted); }
-
-    .section-head {
-      display: flex; align-items: baseline; justify-content: space-between;
-      margin: 20px 2px 8px;
-    }
-    .section-head h2 { margin: 0; font-size: .8rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
-    .saved-note { margin: 2px 2px 0; font-size: .8rem; color: var(--muted); }
-    .link-btn { background: none; border: 0; padding: 8px 0 8px 12px; color: var(--brand); font-size: .9rem; font-weight: 600; }
-
-    .chips { display: flex; flex-wrap: wrap; gap: 8px; }
-    .chip {
-      display: inline-flex; align-items: center; gap: 4px;
-      min-height: 40px;
-      padding: 0 6px 0 14px;
-      border-radius: 999px;
-      background: var(--brand-soft);
-      color: var(--brand-soft-ink);
-      border: 0;
-      font-weight: 500;
-    }
-    .chip .x { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; font-size: 1.1rem; line-height: 1; }
-    .chip:hover .x { background: rgba(0, 0, 0, .08); }
-    .chip.suggest { background: var(--surface); color: var(--text); border: 1px dashed var(--line); padding: 0 14px; }
-    .chip.suggest::before { content: "+"; color: var(--brand); font-weight: 700; margin-right: 2px; }
-
-    .cards { display: grid; gap: 12px; }
-    .card {
-      background: var(--surface);
-      border: 1px solid var(--line);
-      border-radius: 18px;
-      padding: 14px 16px;
-      box-shadow: var(--shadow);
-    }
-    .card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
-    .card h3 { margin: 0; font-size: 1.05rem; }
-    .rank { color: var(--muted); font-weight: 500; margin-right: 6px; }
-    .score { flex: none; font-size: .8rem; font-weight: 600; color: var(--brand-soft-ink); background: var(--brand-soft); padding: 3px 10px; border-radius: 999px; }
-    .bar { height: 6px; margin: 10px 0 12px; background: var(--line); border-radius: 999px; overflow: hidden; }
-    .bar span { display: block; height: 100%; background: var(--brand); border-radius: inherit; }
-    .ings { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; padding: 0; list-style: none; }
-    .ings li { font-size: .82rem; padding: 3px 10px; border-radius: 999px; border: 1px solid var(--line); color: var(--muted); }
-    .ings li.have { background: var(--brand-soft); border-color: transparent; color: var(--brand-soft-ink); font-weight: 600; }
-    .ings li.have::before { content: "✓ "; }
-
-    .empty { text-align: center; padding: 28px 12px 8px; }
-    .empty .icon { font-size: 2.6rem; line-height: 1; }
-    .empty h3 { margin: 12px 0 4px; font-size: 1.1rem; }
-    .empty p { margin: 0 auto 16px; color: var(--muted); max-width: 30ch; }
-    .empty .chips { justify-content: center; }
-
-    .ai-btn { width: 100%; }
-    .ai-msg { margin: 16px 2px 0; text-align: center; color: var(--muted); }
-    .ai-msg + .ai-msg { margin-top: 4px; }
-    #ai-results .cards { margin-top: 12px; }
-    .ai-card { overflow-wrap: anywhere; } /* AI text can hold long unbroken words */
-    .ai-label { margin: 0 0 4px; font-size: .75rem; font-weight: 600; color: var(--muted); }
-    .ai-card .ings { margin-top: 10px; }
-    .steps { margin: 12px 0 0; padding-left: 1.4em; }
-    .steps li { margin-top: 4px; }
-
-    .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-  </style>
 </head>
 <body>
-  <div class="app">
-    <header>
-      <h1>Pantry Match</h1>
-      <p>Tell me what you have. I'll find what to cook.</p>
-    </header>
-
-    <main>
-      <form class="add-row" id="add-form" autocomplete="off">
-        <label class="visually-hidden" for="ing-input">Add an ingredient</label>
-        <input id="ing-input" type="text" placeholder="e.g. eggs, cheese" enterkeyhint="done">
-        <button class="btn" type="submit">Add</button>
-      </form>
-      <p class="hint">Separate several with commas.</p>
-      <!-- Outside #pantry so a failed save still shows when the pantry is empty. -->
-      <p class="saved-note" id="saved-note">Saved on this device</p>
-
-      <section id="pantry" hidden>
-        <div class="section-head">
-          <h2>Your pantry</h2>
-          <button class="link-btn" id="clear-btn" type="button">Clear all</button>
+  <ion-app>
+    <ion-header class="ion-no-border">
+      <ion-toolbar>
+        <div class="brand">
+          <span class="logo" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 4c-8 0-14 4-14 11 0 1.4.3 2.6.8 3.6L5 20.4l1.4 1.4 1.8-1.8c1 .6 2.3 1 3.8 1 6 0 8-6 8-13V4z"/></svg>
+          </span>
+          <h1>Pantry Match</h1>
         </div>
-        <div class="chips" id="chips"></div>
-      </section>
+      </ion-toolbar>
+    </ion-header>
 
-      <section>
-        <div class="section-head"><h2 id="results-title">Top recipes</h2></div>
-        <div id="results" aria-live="polite"></div>
-      </section>
+    <ion-content>
+      <main class="page">
+        <section>
+          <div class="section-head"><h2>Add ingredients</h2></div>
+          <form class="add-row" id="add-form" autocomplete="off">
+            <ion-input class="pm-input" id="ing-input" aria-label="Add an ingredient" placeholder="e.g. eggs, cheese" enterkeyhint="done"></ion-input>
+            <ion-button class="add-btn" type="submit">Add</ion-button>
+          </form>
+          <p class="hint">Separate several with commas.</p>
+          <!-- Outside #pantry so a failed save still shows when the pantry is empty. -->
+          <p class="save-note" id="saved-note">
+            <svg class="icon-ok" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z"/><path d="M9 12l2 2 4-4"/></svg>
+            <span class="icon-error" aria-hidden="true">!</span>
+            <span id="saved-text">Saved on this device</span>
+          </p>
+        </section>
 
-      <section>
-        <div class="section-head"><h2>AI ideas</h2></div>
-        <button class="btn ai-btn" id="ai-btn" type="button" aria-busy="false">Suggest with AI</button>
-        <p class="hint">Sends your pantry list to Google Gemini.</p>
-        <div id="ai-results" aria-live="polite"></div>
-      </section>
-    </main>
-  </div>
+        <section id="pantry" hidden>
+          <div class="section-head">
+            <h2>Your pantry</h2>
+            <button class="link-btn" id="clear-btn" type="button">Clear all</button>
+          </div>
+          <div class="chips" id="chips"></div>
+        </section>
+
+        <section>
+          <div class="section-head"><h2 id="results-title">Top recipes</h2></div>
+          <div id="results" aria-live="polite"></div>
+        </section>
+
+        <section>
+          <div class="section-head"><h2>AI ideas</h2></div>
+          <ion-button class="ai-btn" id="ai-btn" aria-busy="false">Suggest with AI</ion-button>
+          <p class="hint ai-hint">Sends your pantry list to Google Gemini.</p>
+          <div id="ai-results" aria-live="polite"></div>
+        </section>
+      </main>
+    </ion-content>
+  </ion-app>
+
+  <!-- Copied (never parsed from text) into each empty state. -->
+  <template id="basket-icon">
+    <span class="empty-icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10h16l-1.5 9a2 2 0 0 1-2 1.7h-9a2 2 0 0 1-2-1.7L4 10z"/><path d="M8 10l4-6 4 6"/><path d="M10 14v3M14 14v3"/></svg>
+    </span>
+  </template>
 
   <script type="module">
+    // Ionic's CSS, then our theme and page CSS last so they win.
+    import "@ionic/core/css/core.css";
+    import "@ionic/core/css/normalize.css";
+    import "@ionic/core/css/structure.css";
+    import "@ionic/core/css/typography.css";
+    import "@ionic/core/css/palettes/dark.system.css";
+    import "./theme.css";
+    import "./app.css";
+
     import { matchRecipes, sameIngredient } from "./match.js";
     import { recipes } from "./recipes.js";
     import { parseIngredients } from "./parse.js";
     import { savePantry, loadPantry } from "./pantry.js";
     import { checkSuggestions } from "./suggest.js";
+
+    // One look on every device (see DESIGN.md). Ionic is loaded at runtime from
+    // the base path, as in Ionic's JS quickstart. If it fails, the page still
+    // works with plain elements.
+    window.Ionic = { config: { mode: "md" } };
+    try {
+      await import(/* @vite-ignore */ import.meta.env.BASE_URL + "ionic.esm.js");
+    } catch (error) {
+      console.error("Ionic didn't load", error);
+    }
 
     // The AI proxy (worker/): the deployed Worker on the live site, otherwise
     // the local one from `wrangler dev`. Both addresses are public; the key is
@@ -243,12 +119,19 @@
     const results = document.getElementById("results");
     const aiBtn = document.getElementById("ai-btn");
     const aiResults = document.getElementById("ai-results");
+    const savedNote = document.getElementById("saved-note");
+    const savedText = document.getElementById("saved-text");
+
+    // The save note turns into the error box when saving doesn't work.
+    function showSaveNote(text, ok) {
+      savedText.textContent = text;
+      savedNote.classList.toggle("is-error", !ok);
+    }
 
     // Some private-browsing modes throw just for reading localStorage; then the page works without saving.
     let storage = null;
     try { storage = window.localStorage; } catch {}
-    const savedNote = document.getElementById("saved-note");
-    if (!storage) savedNote.textContent = "Not saved: this browser is blocking storage";
+    if (!storage) showSaveNote("Not saved: this browser is blocking storage", false);
 
     let have = loadPantry(storage);
 
@@ -258,7 +141,8 @@
       have = next;
       if (changed) resetAi();
       if (storage) {
-        savedNote.textContent = savePantry(storage, have) ? "Saved on this device" : "Couldn't save on this device";
+        const saved = savePantry(storage, have);
+        showSaveNote(saved ? "Saved on this device" : "Couldn't save on this device", saved);
       }
       render();
     }
@@ -288,36 +172,37 @@
       setPantry(have.filter((h) => h !== name));
     }
 
+    // Tapping anywhere on a chip works; the inner button gives keyboard and
+    // screen-reader users the same action (its click bubbles to the chip).
     function suggestionChips(count) {
       const picks = popular.filter((p) => !have.some((h) => sameIngredient(h, p))).slice(0, count);
       return el("div", { className: "chips" }, picks.map((p) =>
-        el("button", { type: "button", className: "chip suggest", textContent: p, onclick: () => add([p]) })
+        el("ion-chip", { className: "chip suggest", onclick: () => add([p]) }, [
+          el("button", { type: "button", className: "chip-label", textContent: p }),
+        ])
       ));
     }
 
-    function emptyState(icon, title, text, extra = []) {
+    function emptyState(title, text, extra = []) {
+      const icon = document.getElementById("basket-icon").content.cloneNode(true);
       return el("div", { className: "empty" }, [
-        el("div", { className: "icon", textContent: icon, ariaHidden: "true" }),
+        icon,
         el("h3", { textContent: title }),
         el("p", { textContent: text }),
         ...extra,
       ]);
     }
 
-    function recipeCard(recipe, rank) {
+    function recipeCard(recipe) {
       const owned = recipe.ingredients.filter((i) => have.some((h) => sameIngredient(h, i)));
-      const pct = Math.round((owned.length / recipe.ingredients.length) * 100);
-      return el("article", { className: "card" }, [
-        el("div", { className: "card-top" }, [
-          el("h3", {}, [el("span", { className: "rank", textContent: `${rank}.` }), recipe.name]),
-          el("span", { className: "score", textContent: `${owned.length} of ${recipe.ingredients.length}` }),
+      const missing = recipe.ingredients.filter((i) => !owned.includes(i));
+      return el("ion-card", { className: "card" }, [
+        el("ion-card-content", {}, [
+          el("h3", { className: "card-title", textContent: recipe.name }),
+          el("p", { className: "count", textContent: `${owned.length} of ${recipe.ingredients.length} ingredients` }),
+          el("p", { className: "have", textContent: owned.join(" · ") }),
+          el("p", { className: "missing", textContent: missing.length ? `Missing: ${missing.join(" · ")}` : "Nothing missing" }),
         ]),
-        el("div", { className: "bar", role: "img", ariaLabel: `You have ${pct}% of the ingredients` }, [
-          el("span", { style: `width:${pct}%` }),
-        ]),
-        el("ul", { className: "ings" }, recipe.ingredients.map((i) =>
-          el("li", { className: owned.includes(i) ? "have" : "", textContent: i })
-        )),
       ]);
     }
 
@@ -331,7 +216,7 @@
 
     function setAiBusy(busy) {
       aiBusy = busy;
-      aiBtn.textContent = busy ? "Thinking…" : "Suggest with AI";
+      aiBtn.replaceChildren(...(busy ? [el("ion-spinner", { name: "dots" }), "Thinking…"] : ["Suggest with AI"]));
       aiBtn.setAttribute("aria-busy", String(busy));
       aiBtn.disabled = busy || have.length === 0;
     }
@@ -350,11 +235,13 @@
     }
 
     function aiCard(recipe) {
-      return el("article", { className: "card ai-card" }, [
-        el("p", { className: "ai-label", textContent: "AI suggestion · check before cooking" }),
-        el("h3", { textContent: recipe.name }),
-        el("ul", { className: "ings" }, recipe.ingredients.map((i) => el("li", { textContent: i }))),
-        el("ol", { className: "steps" }, recipe.steps.map((s) => el("li", { textContent: s }))),
+      return el("ion-card", { className: "card ai-card" }, [
+        el("ion-card-content", {}, [
+          el("p", { className: "ai-label", textContent: "AI suggestion · check before cooking" }),
+          el("h3", { className: "card-title", textContent: recipe.name }),
+          el("p", { className: "have", textContent: recipe.ingredients.join(" · ") }),
+          el("ol", { className: "steps" }, recipe.steps.map((s) => el("li", { textContent: s }))),
+        ]),
       ]);
     }
 
@@ -391,7 +278,7 @@
       aiController = controller;
       const timer = setTimeout(() => controller.abort(), AI_TIMEOUT_MS);
       setAiBusy(true);
-      aiResults.replaceChildren(aiMessage("Asking the AI for ideas… this can take up to 20 seconds"));
+      aiResults.replaceChildren(el("p", { className: "ai-loading", textContent: "Asking the AI for ideas… this can take up to 20 seconds" }));
 
       let outcome;
       try {
@@ -420,21 +307,21 @@
       if (outcome === "busy" && matchRecipes(have, recipes).length > 0) {
         lines.push(aiMessage("Meanwhile, your best matches from our recipes are in Top recipes above."));
       }
-      aiResults.replaceChildren(...lines);
+      aiResults.replaceChildren(el("div", { className: "note" }, lines));
     }
 
     function render() {
       pantry.hidden = have.length === 0;
       aiBtn.disabled = aiBusy || have.length === 0;
       chipsEl.replaceChildren(...have.map((name) =>
-        el("button", { type: "button", className: "chip", ariaLabel: `Remove ${name}`, onclick: () => remove(name) }, [
-          name,
-          el("span", { className: "x", textContent: "×", ariaHidden: "true" }),
+        el("ion-chip", { className: "chip", onclick: () => remove(name) }, [
+          el("span", { textContent: name }),
+          el("button", { type: "button", className: "chip-x", ariaLabel: `Remove ${name}`, textContent: "×" }),
         ])
       ));
 
       if (have.length === 0) {
-        results.replaceChildren(emptyState("🧺", "What's in your kitchen?",
+        results.replaceChildren(emptyState("What's in your kitchen?",
           "Add a few ingredients above, or tap one to start.", [suggestionChips(6)]));
         return;
       }
@@ -442,25 +329,25 @@
       const matches = matchRecipes(have, recipes);
       if (matches.length === 0) {
         const list = have.length === 1 ? `“${have[0]}”` : "those ingredients";
-        results.replaceChildren(emptyState("🍳", "No recipes yet",
+        results.replaceChildren(emptyState("No recipes yet",
           `None of our ${recipes.length} recipes use ${list}. Try adding something common:`, [suggestionChips(5)]));
         return;
       }
 
-      results.replaceChildren(el("div", { className: "cards" }, matches.map((r, i) => recipeCard(r, i + 1))));
+      results.replaceChildren(el("div", { className: "cards" }, matches.map(recipeCard)));
     }
 
     form.addEventListener("submit", (e) => {
       e.preventDefault();
-      add(parseIngredients(input.value));
+      add(parseIngredients(input.value ?? ""));
       input.value = "";
-      input.focus();
+      input.setFocus?.();
     });
 
     document.getElementById("clear-btn").addEventListener("click", () => {
       if (!confirm("Clear your whole pantry?")) return;
       setPantry([]);
-      input.focus();
+      input.setFocus?.();
     });
 
     aiBtn.addEventListener("click", suggestWithAi);
