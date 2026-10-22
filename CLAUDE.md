@@ -8,7 +8,7 @@ This repo is built in `/app-coach` lessons. The learner writes certain functions
 - `matchRecipes` and `sameIngredient` in `match.js` (Level 1)
 - `savePantry` and `loadPantry` in `pantry.js` (Level 2)
 - `buildPrompt` and `checkSuggestions` in `suggest.js` (Level 3)
-- `theme.css`: colors, fonts and spacing as CSS variables, light and dark (Level 4)
+- `contrastRatio` in `contrast.js` (Level 4). `theme.css` is written by Claude.
 
 Give the smallest useful hint instead (the failing test, the line, or the concept to look up).
 

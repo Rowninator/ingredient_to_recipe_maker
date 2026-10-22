@@ -45,7 +45,7 @@ For dark mode and large text, there's no design to compare with. The check there
 - **Node:** Vite 8 needs Node `^20.19.0 || >=22.12.0`; local is **24.18.0**, and the deploy workflow uses the same version.
 - **Ionic setup:** the official [JS quickstart](https://ionicframework.com/docs/javascript/quickstart): runtime import of `/ionic.esm.js`, `vite-plugin-static-copy`, `@ionic/core` excluded from bundling.
 - **Mode:** forced to `md` everywhere (`window.Ionic = { config: { mode: 'md' } }` before Ionic loads), so all devices match the screenshots.
-- **Dark mode:** `@ionic/core/css/palettes/dark.system.css` ([dark mode](https://ionicframework.com/docs/theming/dark-mode)). The learner's dark values in `theme.css` apply **only in dark mode**: they sit inside the same dark-mode media query and target `:root.md` to win over Ionic's palette. Light values apply otherwise.
+- **Dark mode:** `@ionic/core/css/palettes/dark.system.css` ([dark mode](https://ionicframework.com/docs/theming/dark-mode)). The dark values in `theme.css` apply **only in dark mode**: they sit inside the same dark-mode media query and target `:root.md` to win over Ionic's palette. Light values apply otherwise.
 - **Dev server:** `npm start` runs Vite with `server: { port: 3000, strictPort: true }`; `server.js` and `server.test.js` are removed.
 - **Dev server deny list:** the first `vite.config.js` sets `server.fs.deny` to Vite's default list plus `.dev.vars`, `.dev.vars.*`, `**/.claude/**` and `**/.wrangler/**` (local data folders; all checked to return 403). The [docs](https://vite.dev/config/server-options) don't say whether setting it replaces the default, so the default entries are repeated. The deny list doesn't cover Vite's `public/` folder, so nothing secret goes there.
 - **Accepted audit finding (2026-10-22):** `npm audit` reports 3 high in `braces` (via `chokidar`, via `vite-plugin-static-copy`), a denial-of-service from deeply nested patterns. It's dev and build-time only and our patterns come from our own config; npm's "fix" downgrades the plugin to 0.2.0. The learner checks for a plugin update before the Level 5 release build.
@@ -70,11 +70,11 @@ For dark mode and large text, there's no design to compare with. The check there
    - Install the pinned versions and commit `package-lock.json`.
    - Check that the dev server refuses `/worker/.dev.vars`, and that `dist/` has no tests, `worker/` or `.md` files.
    - All asset paths stay relative or use `base`.
-5. **`theme.css` (learner).**
-   - The learner writes the colors, fonts and spacing from the designs as CSS variables, with light and dark versions.
-   - The designs have no dark versions, so Claude proposes dark values first and waits for the learner's approval.
-   - Before the learner writes them, Claude shows where the dark values go (the dark-mode block) so they apply only in dark mode.
-   - Contrast is checked in both modes.
+5. **`theme.css` (Claude) and `contrastRatio` (learner).** Changed on 2026-10-22: the learner's Level 4 piece is now the contrast function, not the theme file.
+   - Claude writes `theme.css` from the measured light values and the approved dark values, as CSS variables with the same names in both blocks (light in `:root`, dark in `@media (prefers-color-scheme: dark) { :root.md }`).
+   - Approved changes from the designs: 8 low-contrast texts use muted grey `#65736d`, muted green `#5b7a5f` and step number `#5f6a52`. The system font stack is used.
+   - Claude writes `contrast.test.js` and an empty stub first. The learner writes `contrastRatio(hexA, hexB)` in `contrast.js` (two `#rrggbb` colours in, the WCAG ratio out, throws on anything else).
+   - Once it passes, Claude adds `theme.test.js`, which reads `theme.css` and uses `contrastRatio` to check every text/background pair in light and dark: 4.5:1 for text, 3:1 for icons and the input border.
    - This is done before the rebuild.
 6. **Rebuild the page with Ionic components** (Claude), using `theme.css`.
    - Same ids, behavior, messages, `el()`/`textContent` (never `innerHTML`), and `setPantry` flow.

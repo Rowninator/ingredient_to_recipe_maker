@@ -1,0 +1,123 @@
+/* Pantry Match theme (Level 4).
+   Light values are measured from design/reference/, with darker text where the
+   designs fell below 4.5:1. Dark values were approved in step 5. Both blocks use
+   the same names, and theme.test.js checks every text/background pair. */
+
+/* ===== Light: always applies ===== */
+:root {
+  /* Fonts */
+  --pm-font: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+
+  /* Surfaces */
+  --pm-bg: #fbfaf5;
+  --pm-surface: #fffefa;
+  --pm-header-bg: #f6f7ef;
+
+  /* Borders. Cards are decorative; the input border must reach 3:1. */
+  --pm-border: #e3e7dd;
+  --pm-input-border: #86938c;
+
+  /* Primary: button fill and the link text ("Clear all") */
+  --pm-primary: #155b55;
+  --pm-on-primary: #ffffff;
+  --pm-link: #155b55;
+
+  /* Text */
+  --pm-title: #104c47;
+  --pm-text: #202e2b;
+  --pm-text-2: #53645d;
+  --pm-muted: #65736d;
+  --pm-muted-green: #5b7a5f;
+  --pm-count: #477157;
+
+  /* Chips */
+  --pm-chip-bg: #edf5ed;
+  --pm-chip-text: #315c4d;
+  --pm-chip-icon: #78927e;
+
+  /* AI recipe steps */
+  --pm-step-bg: #e8f1e8;
+  --pm-step-num: #5f6a52;
+
+  /* Notes: info/busy, and save error (the error icon uses the error text colour) */
+  --pm-note-bg: #eef5ee;
+  --pm-note-text: #3c5a4e;
+  --pm-error-bg: #f8ebe2;
+  --pm-error-text: #7d5f4c;
+
+  /* Logo (decorative) */
+  --pm-logo: #16b96b;
+  --pm-logo-leaf: #ffffff;
+
+  /* Spacing and radius (approximate, from the designs) */
+  --pm-gutter: 16px;
+  --pm-card-pad: 14px;
+  --pm-gap-s: 8px;
+  --pm-gap-m: 12px;
+  --pm-gap-l: 24px;
+  --pm-radius-card: 12px;
+  --pm-radius-control: 14px;
+  --pm-radius-pill: 999px;
+
+  /* Ionic's own variables */
+  --ion-font-family: var(--pm-font);
+  --ion-background-color: #fbfaf5;
+  --ion-background-color-rgb: 251, 250, 245;
+  --ion-text-color: #202e2b;
+  --ion-text-color-rgb: 32, 46, 43;
+  --ion-color-primary: #155b55;
+  --ion-color-primary-rgb: 21, 91, 85;
+  --ion-color-primary-contrast: #ffffff;
+  --ion-color-primary-contrast-rgb: 255, 255, 255;
+  --ion-color-primary-shade: #12504b;
+  --ion-color-primary-tint: #2c6b66;
+}
+
+/* ===== Dark: only when the device is in dark mode ===== */
+@media (prefers-color-scheme: dark) {
+  :root.md {
+    --pm-bg: #111614;
+    --pm-surface: #1a201e;
+    --pm-header-bg: #151b19;
+
+    --pm-border: #2c3633;
+    --pm-input-border: #64726c;
+
+    --pm-primary: #1d6f67;
+    --pm-on-primary: #ffffff;
+    --pm-link: #7fcfc2;
+
+    --pm-title: #8fd6c8;
+    --pm-text: #e6ece8;
+    --pm-text-2: #bccac3;
+    --pm-muted: #9aa79f;
+    --pm-muted-green: #9cc4a6;
+    --pm-count: #93cfa7;
+
+    --pm-chip-bg: #1f2d28;
+    --pm-chip-text: #bfe0cc;
+    --pm-chip-icon: #8fb09b;
+
+    --pm-step-bg: #243530;
+    --pm-step-num: #c7d6b4;
+
+    --pm-note-bg: #18261f;
+    --pm-note-text: #c6dccf;
+    --pm-error-bg: #36231b;
+    --pm-error-text: #f2cdb8;
+
+    --pm-logo: #16b96b;
+    --pm-logo-leaf: #ffffff;
+
+    --ion-background-color: #111614;
+    --ion-background-color-rgb: 17, 22, 20;
+    --ion-text-color: #e6ece8;
+    --ion-text-color-rgb: 230, 236, 232;
+    --ion-color-primary: #1d6f67;
+    --ion-color-primary-rgb: 29, 111, 103;
+    --ion-color-primary-contrast: #ffffff;
+    --ion-color-primary-contrast-rgb: 255, 255, 255;
+    --ion-color-primary-shade: #1a625b;
+    --ion-color-primary-tint: #347d76;
+  }
+}
