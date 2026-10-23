@@ -22,11 +22,6 @@ export default defineConfig({
   preview: { port: 3000, strictPort: true },
   // From Ionic's JS quickstart.
   optimizeDeps: { exclude: ['@ionic/core'] },
-  build: {
-    rollupOptions: {
-      output: { manualChunks: undefined },
-    },
-  },
   plugins: [
     viteStaticCopy({
       targets: [{

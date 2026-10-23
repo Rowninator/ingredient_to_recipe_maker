@@ -81,6 +81,12 @@ ion-button.button-disabled {
 .ai-hint { text-align: center; }
 .ai-btn ion-spinner { width: 18px; height: 18px; margin-right: 8px; color: currentColor; }
 
+/* --- Ionic didn't load --- */
+.load-error {
+  margin: 0 0 var(--pm-gap-l); padding: 10px 12px; border-radius: 10px;
+  font-size: .875rem; background: var(--pm-error-bg); color: var(--pm-error-text);
+}
+
 /* --- Save note --- */
 .save-note {
   display: flex; align-items: center; gap: 6px;

@@ -41,9 +41,11 @@ test("works on very dark channels (the low end of the WCAG formula)", () => {
   close(contrastRatio("#050505", "#000000"), 1.03);
 });
 
+// The error must name the expected format, so a crash (a TypeError from
+// reading a bad value) doesn't count as rejecting it.
 test("throws on anything that isn't #rrggbb", () => {
   for (const bad of ["#fff", "155b55", "#15b5g5", "#155b55ff", "red", "", null, undefined, 42]) {
-    assert.throws(() => contrastRatio(bad, "#ffffff"), Error, `should throw for ${String(bad)}`);
-    assert.throws(() => contrastRatio("#ffffff", bad), Error, `should throw for ${String(bad)} as the 2nd colour`);
+    assert.throws(() => contrastRatio(bad, "#ffffff"), /rrggbb/i, `should throw for ${String(bad)}`);
+    assert.throws(() => contrastRatio("#ffffff", bad), /rrggbb/i, `should throw for ${String(bad)} as the 2nd colour`);
   }
 });

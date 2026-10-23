@@ -41,6 +41,9 @@ const PAIRS = [
   ["--pm-chip-text", "--pm-chip-bg", TEXT, "chip text"],
   ["--pm-step-num", "--pm-step-bg", TEXT, "AI step number"],
   ["--pm-note-text", "--pm-note-bg", TEXT, "info/busy note"],
+  ["--pm-text", "--pm-note-bg", TEXT, "empty-state heading"],
+  ["--pm-muted", "--pm-note-bg", TEXT, "empty-state text"],
+  ["--pm-chip-text", "--pm-surface", TEXT, "suggestion chip text"],
   ["--pm-error-text", "--pm-error-bg", TEXT, "save-error note (text and icon)"],
   ["--ion-text-color", "--ion-background-color", TEXT, "Ionic default text"],
   ["--ion-color-primary-contrast", "--ion-color-primary", TEXT, "Ionic primary button text"],
@@ -72,6 +75,30 @@ test("every colour is #rrggbb", () => {
     for (const [name, value] of Object.entries(vars)) {
       if (value.startsWith("#")) assert.match(value, /^#[0-9a-f]{6}$/i, `${mode} ${name}`);
     }
+  }
+});
+
+// Ionic's variables repeat ours as hex (the -rgb twins can't use var()), and
+// so do index.html's theme-color metas; these keep them from drifting apart.
+const TWINS = [
+  ["--ion-background-color", "--pm-bg"],
+  ["--ion-text-color", "--pm-text"],
+  ["--ion-color-primary", "--pm-primary"],
+  ["--ion-color-primary-contrast", "--pm-on-primary"],
+];
+
+test("each Ionic colour equals its --pm twin", () => {
+  for (const [mode, vars] of Object.entries(modes)) {
+    for (const [ion, pm] of TWINS) assert.equal(vars[ion], vars[pm], `${mode} ${ion}`);
+  }
+});
+
+test("index.html's theme-color metas equal --pm-header-bg", () => {
+  const html = readFileSync(new URL("./index.html", import.meta.url), "utf8");
+  for (const [mode, vars] of Object.entries(modes)) {
+    const meta = new RegExp(`<meta name="theme-color" content="([^"]+)" media="\\(prefers-color-scheme: ${mode}\\)">`).exec(html);
+    assert.ok(meta, `index.html has no ${mode} theme-color meta`);
+    assert.equal(meta[1], vars["--pm-header-bg"], `${mode} theme-color`);
   }
 });
 

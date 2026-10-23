@@ -72,7 +72,7 @@ For dark mode and large text, there's no design to compare with. The check there
    - All asset paths stay relative or use `base`.
 5. **`theme.css` (Claude) and `contrastRatio` (learner).** Changed on 2026-10-22: the learner's Level 4 piece is now the contrast function, not the theme file.
    - Claude writes `theme.css` from the measured light values and the approved dark values, as CSS variables with the same names in both blocks (light in `:root`, dark in `@media (prefers-color-scheme: dark) { :root.md }`).
-   - Approved changes from the designs: 8 low-contrast texts use muted grey `#65736d`, muted green `#5b7a5f` and step number `#5f6a52`. The system font stack is used.
+   - Approved changes from the designs: 8 low-contrast texts use muted grey `#65736d` (darkened to `#63716b` at the step 7 review, so the empty-state text reaches 4.5:1 on its box), muted green `#5b7a5f` and step number `#5f6a52`. The system font stack is used.
    - Claude writes `contrast.test.js` and an empty stub first. The learner writes `contrastRatio(hexA, hexB)` in `contrast.js` (two `#rrggbb` colours in, the WCAG ratio out, throws on anything else).
    - Once it passes, Claude adds `theme.test.js`, which reads `theme.css` and uses `contrastRatio` to check every text/background pair in light and dark: 4.5:1 for text, 3:1 for icons and the input border.
    - This is done before the rebuild.

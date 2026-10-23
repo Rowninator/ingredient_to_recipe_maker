@@ -46,7 +46,7 @@
         </section>
 
         <section>
-          <div class="section-head"><h2 id="results-title">Top recipes</h2></div>
+          <div class="section-head"><h2 id="results-title" tabindex="-1">Top recipes</h2></div>
           <div id="results" aria-live="polite"></div>
         </section>
 
@@ -84,13 +84,17 @@
     import { checkSuggestions } from "./suggest.js";
 
     // One look on every device (see DESIGN.md). Ionic is loaded at runtime from
-    // the base path, as in Ionic's JS quickstart. If it fails, the page still
-    // works with plain elements.
+    // the base path, as in Ionic's JS quickstart. Without it the input and
+    // buttons don't work, so the page only asks the user to refresh.
     window.Ionic = { config: { mode: "md" } };
     try {
       await import(/* @vite-ignore */ import.meta.env.BASE_URL + "ionic.esm.js");
     } catch (error) {
       console.error("Ionic didn't load", error);
+      document.querySelector(".page").prepend(el("p", {
+        className: "load-error", role: "alert",
+        textContent: "Part of the page didn't load. Refresh to try again.",
+      }));
     }
 
     // The AI proxy (worker/): the deployed Worker on the live site, otherwise
@@ -168,8 +172,21 @@
       setPantry(next);
     }
 
-    function remove(name) {
+    // Re-rendering destroys the focused chip, so a keyboard user's focus moves
+    // to the chip now in its place (or the last one). With none left the pantry
+    // section is hidden, so focus goes to the Top recipes heading above the
+    // empty state (not the input, which would open a phone's keyboard).
+    // New chips stay hidden (so unfocusable) until Ionic has set them up.
+    async function remove(name) {
+      const index = have.indexOf(name);
+      const hadFocus = chipsEl.contains(document.activeElement);
       setPantry(have.filter((h) => h !== name));
+      if (!hadFocus) return;
+      const buttons = chipsEl.querySelectorAll(".chip-x");
+      const next = buttons[Math.min(index, buttons.length - 1)];
+      if (!next) return document.getElementById("results-title").focus();
+      await next.closest("ion-chip").componentOnReady?.();
+      next.focus();
     }
 
     // Tapping anywhere on a chip works; the inner button gives keyboard and
@@ -256,8 +273,8 @@
           return "garbled";
         }
         // Second check in case the proxy is ever wrong.
-        const recipes = checkSuggestions(body, sent);
-        return recipes.length > 0 ? recipes : "none";
+        const ideas = checkSuggestions(body, sent);
+        return ideas.length > 0 ? ideas : "none";
       }
       if (response.status === 502) return "garbled";
       if (response.status === 504) return "timeout";
