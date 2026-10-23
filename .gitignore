@@ -11,3 +11,6 @@ worker/.env.*
 
 # Wrangler's local build and state folder (any level)
 .wrangler/
+
+# Left behind only if vite.test.js is killed mid-run
+deny-test-*/

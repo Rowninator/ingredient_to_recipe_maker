@@ -181,8 +181,19 @@
       const index = have.indexOf(name);
       const hadFocus = chipsEl.contains(document.activeElement);
       setPantry(have.filter((h) => h !== name));
-      if (!hadFocus) return;
-      const buttons = chipsEl.querySelectorAll(".chip-x");
+      if (hadFocus) await refocus(chipsEl, ".chip-x", index);
+    }
+
+    // Same for a suggestion chip: focus moves to the suggestion now in its
+    // place, or to the Top recipes heading once recipe cards replace them.
+    async function addSuggestion(name, index) {
+      const hadFocus = results.contains(document.activeElement);
+      add([name]);
+      if (hadFocus) await refocus(results, ".chip-label", index);
+    }
+
+    async function refocus(container, selector, index) {
+      const buttons = container.querySelectorAll(selector);
       const next = buttons[Math.min(index, buttons.length - 1)];
       if (!next) return document.getElementById("results-title").focus();
       await next.closest("ion-chip").componentOnReady?.();
@@ -193,8 +204,8 @@
     // screen-reader users the same action (its click bubbles to the chip).
     function suggestionChips(count) {
       const picks = popular.filter((p) => !have.some((h) => sameIngredient(h, p))).slice(0, count);
-      return el("div", { className: "chips" }, picks.map((p) =>
-        el("ion-chip", { className: "chip suggest", onclick: () => add([p]) }, [
+      return el("div", { className: "chips" }, picks.map((p, i) =>
+        el("ion-chip", { className: "chip suggest", onclick: () => addSuggestion(p, i) }, [
           el("button", { type: "button", className: "chip-label", textContent: p }),
         ])
       ));
@@ -235,7 +246,13 @@
       aiBusy = busy;
       aiBtn.replaceChildren(...(busy ? [el("ion-spinner", { name: "dots" }), "Thinking…"] : ["Suggest with AI"]));
       aiBtn.setAttribute("aria-busy", String(busy));
-      aiBtn.disabled = busy || have.length === 0;
+      // Keeps the button's normal colours while busy, so "Thinking…" stays readable.
+      aiBtn.classList.toggle("is-busy", busy);
+      updateAiBtn();
+    }
+
+    function updateAiBtn() {
+      aiBtn.disabled = aiBusy || have.length === 0;
     }
 
     // The AI cards no longer match a changed pantry: drop them and any request.
@@ -280,7 +297,10 @@
       if (response.status === 504) return "timeout";
       if (response.status === 429) return "rateLimited";
       if (response.status === 503) {
-        const body = await response.json().catch(() => null);
+        const body = await response.json().catch((error) => {
+          if (error.name === "AbortError") throw error;
+          return null;
+        });
         if (body?.error === "quota") return "quota";
         if (body?.error === "busy") return "busy";
       }
@@ -329,7 +349,7 @@
 
     function render() {
       pantry.hidden = have.length === 0;
-      aiBtn.disabled = aiBusy || have.length === 0;
+      updateAiBtn();
       chipsEl.replaceChildren(...have.map((name) =>
         el("ion-chip", { className: "chip", onclick: () => remove(name) }, [
           el("span", { textContent: name }),

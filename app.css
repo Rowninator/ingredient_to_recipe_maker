@@ -9,8 +9,6 @@ ion-content { --background: var(--pm-bg); }
   padding: var(--pm-gutter) var(--pm-gutter) calc(var(--pm-gap-l) + env(safe-area-inset-bottom));
 }
 
-.visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-
 /* --- Header --- */
 ion-toolbar {
   --background: var(--pm-header-bg);
@@ -43,7 +41,7 @@ h2 { margin: 0; font-size: 1.0625rem; font-weight: 700; color: var(--pm-text); }
 /* At large text sizes the input needs more than the row can give, so the
    button wraps below it instead of the placeholder being cut off. */
 .add-row { display: flex; flex-wrap: wrap; gap: var(--pm-gap-s); }
-.add-btn { flex: 1 0 auto; }
+.add-btn { flex: 1 0 auto; --padding-start: 20px; --padding-end: 20px; }
 .pm-input {
   flex: 1000 1 11rem; min-width: 0; min-height: 48px;
   border: 1px solid var(--pm-input-border);
@@ -76,7 +74,11 @@ ion-button.button-disabled {
   --background: color-mix(in srgb, var(--pm-primary) 30%, var(--pm-bg));
   --color: color-mix(in srgb, var(--pm-on-primary) 85%, var(--pm-bg));
 }
-.add-btn { --padding-start: 20px; --padding-end: 20px; }
+/* Busy (disabled while it waits) keeps the normal colours so "Thinking…" stays readable. */
+ion-button.ai-btn.is-busy {
+  --background: var(--pm-primary);
+  --color: var(--pm-on-primary);
+}
 .ai-btn { display: block; width: 100%; }
 .ai-hint { text-align: center; }
 .ai-btn ion-spinner { width: 18px; height: 18px; margin-right: 8px; color: currentColor; }
@@ -116,7 +118,7 @@ ion-chip.chip {
   border: 0; border-radius: 50%; background: none; cursor: pointer;
   font: inherit; font-size: 1.1rem; line-height: 1; color: var(--pm-chip-icon);
 }
-ion-chip.suggest { padding: 0; border-style: dashed; background: var(--pm-surface); --background: var(--pm-surface); }
+ion-chip.suggest { padding: 0; border-style: dashed; --background: var(--pm-surface); }
 .chip-label {
   border: 0; background: none; cursor: pointer; padding: 0 14px; min-height: 36px;
   font: inherit; color: var(--pm-chip-text);

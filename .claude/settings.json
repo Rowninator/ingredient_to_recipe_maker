@@ -6,9 +6,9 @@
         "hooks": [
           {
             "type": "command",
-            "command": "cd \"$CLAUDE_PROJECT_DIR\" && out=$(npm test 2>&1) || { printf '%s\\n' \"$out\" | tail -n 40 >&2; exit 2; }",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/run-tests.mjs\"",
             "timeout": 120,
-            "statusMessage": "Running npm test"
+            "statusMessage": "Running tests"
           }
         ]
       }

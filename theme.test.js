@@ -4,7 +4,7 @@ import { readFileSync } from "node:fs";
 import { contrastRatio } from "./contrast.js";
 
 // Reads the colour variables from theme.css: light from the first `:root {`
-// block, dark from the `:root.md {` block inside the dark-mode media query.
+// block, dark from the `:root:root {` block inside the dark-mode media query.
 const css = readFileSync(new URL("./theme.css", import.meta.url), "utf8");
 
 function block(selector) {
@@ -17,7 +17,7 @@ function block(selector) {
 }
 
 const light = block(":root");
-const darkOnly = block(":root.md");
+const darkOnly = block(":root:root");
 const dark = { ...light, ...darkOnly };
 const modes = { light, dark };
 
