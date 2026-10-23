@@ -62,7 +62,7 @@ For dark mode and large text, there's no design to compare with. The check there
    - the GitHub Actions workflow that deploys to Pages
 
    It reports back with links.
-3. **Test hook.** A project hook in `.claude/settings.json` runs `npm test` after every edit.
+3. **Test hook.** A project hook in `.claude/settings.json` runs `.claude/hooks/run-tests.mjs` after every edit. Changed at the step 7 review (2026-10-22): it only runs for code files in the project (`.js`, `.mjs`, `.css`, `.html`, `.json`, `.jsonc`). Edits under `worker/` run the Worker's tests (skipped if `worker/node_modules` is missing), and all others run `npm test`. Docs and files outside the project don't trigger it. On a failure it shows Claude the last 40 lines and blocks the edit (exit code 2).
 4. **Vite setup.**
    - The logic modules and tests stay unchanged.
    - The dev server runs on **port 3000**, because the local Worker's `DEV_ORIGIN` is `http://localhost:3000`.
@@ -80,6 +80,7 @@ For dark mode and large text, there's no design to compare with. The check there
    - Same ids, behavior, messages, `el()`/`textContent` (never `innerHTML`), and `setPantry` flow.
    - Run the screenshot checks above for every state, then fix the differences.
    - Decided 2026-10-22: the header subtitle is dropped (not in the designs); icons are three inline SVGs (leaf, shield, basket) plus "×" text, so no `ion-icon` and no `svg/` copy; page CSS lives in `app.css`, imported after Ionic and `theme.css`; one style direction (no worktrees). Added `--pm-tile-bg` for the empty-state icon tile (measured `#deece0`; dark `#243530`). At large text sizes the Add button wraps below the input.
+   - Approved change from the designs (step 7 review, 2026-10-22): while the AI request runs, "Suggest with AI" keeps the normal button colours (`--pm-on-primary` on `--pm-primary`, the "button text" pair in `theme.test.js`), not the pale disabled look in `05-ai-loading.png`. The button is still disabled while busy. In light mode the pale look puts "Thinking…" at about 1.7:1, and it's the only status on the button for up to 20 seconds. The busy style is the `.is-busy` class in `app.css`. An empty pantry still shows the pale disabled button, as in the designs.
    - **Optional:** try two style directions in two git worktrees, compare their screenshots, keep one and delete the other.
 7. **Checkpoint.**
    - `npm test` and `cd worker && npm test`.
