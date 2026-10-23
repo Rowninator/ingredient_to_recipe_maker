@@ -62,7 +62,8 @@ For dark mode and large text, there's no design to compare with. The check there
    - the GitHub Actions workflow that deploys to Pages
 
    It reports back with links.
-3. **Test hook.** A project hook in `.claude/settings.json` runs `.claude/hooks/run-tests.mjs` after every edit. Changed at the step 7 review (2026-10-22): it only runs for code files in the project (`.js`, `.mjs`, `.css`, `.html`, `.json`, `.jsonc`). Edits under `worker/` run the Worker's tests (skipped if `worker/node_modules` is missing), and all others run `npm test`. Docs and files outside the project don't trigger it. On a failure it shows Claude the last 40 lines and blocks the edit (exit code 2).
+3. **Test hook.** A project hook in `.claude/settings.json` runs `.claude/hooks/run-tests.mjs` after every edit. Changed at the step 7 review (2026-10-22): it only runs for code files in the project (`.js`, `.mjs`, `.css`, `.html`, `.json`, `.jsonc`). Edits under `worker/` run the Worker's tests (skipped if `worker/node_modules` is missing), and all others run `npm test`. Docs and files outside the project don't trigger it. On a failure it shows Claude the last 40 lines and blocks the edit (exit code 2). Proved on 2026-10-22: a passing edit ran with no report, a broken root test and a broken Worker test were each reported, and undoing them brought both suites back to passing.
+   - **Level 5:** run `npm install` in `worker/` before starting (and on any fresh clone or CI machine). Without `worker/node_modules`, the hook skips the Worker's tests without saying so, so a broken Worker edit would pass unnoticed.
 4. **Vite setup.**
    - The logic modules and tests stay unchanged.
    - The dev server runs on **port 3000**, because the local Worker's `DEV_ORIGIN` is `http://localhost:3000`.
