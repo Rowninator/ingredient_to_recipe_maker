@@ -21,6 +21,37 @@ The Level 3 gate applies again, at two points:
   3. REVIEW.md covers the app's address and the keystore (where it lives, who has the passwords, what happens if it's lost).
   4. The learner confirms the mentor approved REVIEW.md.
 
+## Research decisions (step 2, 2026-10-26)
+
+Done by a subagent. Claude re-checked the versions, the audit status and the back-button source.
+
+- **Versions:** `@capacitor/core`, `@capacitor/cli` and `@capacitor/android` 8.5.3 (2026-10-07), and `@capacitor/app` 8.1.2 (2026-10-02). They're compatible: android needs core `^8.5.0`, app needs core `>=8.0.0`, and the CLI needs Node 22 or newer (this machine and the workflow use 24.18.0). Capacitor 9 is still alpha. [Releases](https://github.com/ionic-team/capacitor/releases/tag/8.5.3)
+- **Tooling:**
+  - Android Studio Otter 2025.2.1 or newer, plus the Android 16 (API 36) SDK Platform. The template defaults are minSdk 24, compileSdk 36 and targetSdk 36. [Environment setup](https://capacitorjs.com/docs/getting-started/environment-setup), [Updating to 8](https://capacitorjs.com/docs/updating/8-0)
+  - Capacitor 8 compiles with Java 21. Android Studio's bundled JDK (`jbr`) provides it, so nothing else is installed. [Capacitor build.gradle](https://github.com/ionic-team/capacitor/blob/8.5.3/android/capacitor/build.gradle)
+  - Terminal builds (`npx cap run`, `gradlew`) use `JAVA_HOME`, so it is pointed at Android Studio's `jbr` folder. Step 3 checks `jbr\bin\java -version`. [Java versions in Android builds](https://developer.android.com/build/jdks)
+- **App address:** the page runs at `https://localhost` (`androidScheme` `https`, `hostname` `localhost`), so `fetch()` sends `Origin: https://localhost`. This comes from the docs and source and hasn't been seen on a device yet, so it is confirmed in `chrome://inspect` before the Worker change. [Config](https://capacitorjs.com/docs/config)
+- **Which Back presses reach the app:**
+  - **Keyboard open:** no. The keyboard takes the press and hides itself. [InputMethodService](https://developer.android.com/reference/android/inputmethodservice/InputMethodService)
+  - **The "Clear all" `confirm()` dialog open:** no. Android cancels the dialog and `confirm()` returns false, which keeps the pantry. [BridgeWebChromeClient](https://github.com/ionic-team/capacitor/blob/8.5.3/android/capacitor/src/main/java/com/getcapacitor/BridgeWebChromeClient.java)
+  - **Ionic's `ionBackButton`:** not used. It fires along with the Capacitor listener, and the page has no Ionic overlays, so using both would handle one press twice. [Hardware back button](https://ionicframework.com/docs/developing/hardware-back-button)
+  - **Everything else:** yes, once `App.addListener('backButton')` is registered. The listener fully replaces the default. Without one, Back on the main screen does nothing (from the 8.1.2 source; checked in the emulator in step 6). `canGoBack` is always false because the page has no history. [App API](https://capacitorjs.com/docs/apis/app)
+- **Back-button cases (approved):**
+  1. An AI request is running → cancel it (the same as `resetAi()` does on a pantry change).
+  2. Otherwise, the page is scrolled down → scroll to the top.
+  3. Otherwise → minimize the app (`App.minimizeApp()`), which keeps its state, like Android 12+ does for a main screen.
+
+  The function takes plain values (no Capacitor imports), so Node can test it.
+- **Google Play:**
+  - New apps and updates must target API 36 (Capacitor's default). [Target SDK](https://support.google.com/googleplay/android-developer/answer/11926878)
+  - New apps must be uploaded as an `.aab`. [App bundles](https://developer.android.com/guide/app-bundle)
+  - Play App Signing is automatic for new apps. Google holds the app signing key. We keep only the **upload key**, which Google can reset if it's lost. [Play App Signing](https://support.google.com/googleplay/android-developer/answer/9842756)
+  - Internal testing allows up to 100 testers, who opt in through a link. It needs no Data safety form. Sending the pantry off the device counts as "collecting" data once the app moves to a wider track. [Internal testing](https://support.google.com/googleplay/android-developer/answer/9845334), [Data safety](https://support.google.com/googleplay/android-developer/answer/10787469)
+  - Every app needs a privacy policy link in Play Console and in the app, so step 8 keeps it. [User Data policy](https://support.google.com/googleplay/android-developer/answer/10144311)
+  - New personal accounts need a 12-tester, 14-day closed test only before production, not for internal testing. [Testing requirements](https://support.google.com/googleplay/android-developer/answer/14151465)
+- **Audit finding:** the `braces` advisory was withdrawn on 2026-10-23, and `npm audit` reports 0 vulnerabilities. `vite-plugin-static-copy` 4.1.1 is still the latest release, so there's no update to take. [GHSA-vfj7-8cjw-p6xm](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm)
+- **Edge-to-edge:** targeting API 36 always draws the app under the system bars. Capacitor 8's SystemBars sets `--safe-area-inset-*`, and Ionic's `--ion-safe-area-*` uses them. `viewport-fit=cover` is already set. Step 7 checks the header, the status bar icon contrast in light and dark, and any custom padding at the screen edges (which should use `var(--ion-safe-area-*)`). [System Bars](https://capacitorjs.com/docs/apis/system-bars)
+
 ## Steps
 
 1. **Plan file.** This file, plus a pointer to it in CLAUDE.md. The learner commits.
