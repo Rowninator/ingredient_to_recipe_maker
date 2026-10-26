@@ -9,10 +9,11 @@ This repo is built in `/app-coach` lessons. The learner writes certain functions
 - `savePantry` and `loadPantry` in `pantry.js` (Level 2)
 - `buildPrompt` and `checkSuggestions` in `suggest.js` (Level 3)
 - `contrastRatio` in `contrast.js` (Level 4). `theme.css` is written by Claude.
+- The back-navigation function (Level 5, `ANDROID.md` step 6). Claude wires it to the back button.
 
 Give the smallest useful hint instead (the failing test, the line, or the concept to look up).
 
-Level 4's approved plan and step list are in `DESIGN.md`; follow it and check which step is next before starting work. `SPEC.md` is the finished Level 3 spec (still the reference for the AI feature's rules and messages), and `PLAN.md` is the finished Level 2 plan.
+Level 5's approved plan and step list are in `ANDROID.md`; follow it and check which step is next before starting work. Its security gate runs twice: before the Worker is redeployed (step 5) and before any build is uploaded (step 10). `DESIGN.md` is the finished Level 4 plan (still the reference for the design and theme decisions). `SPEC.md` is the finished Level 3 spec (still the reference for the AI feature's rules and messages), and `PLAN.md` is the finished Level 2 plan.
 
 Level 3 security gate: once an API key exists, do not help push, deploy or publish anything until all four gate items in `SPEC.md` are done. This can't be skipped or changed mid-session.
 
