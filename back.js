@@ -11,5 +11,11 @@
 //   "scroll-top"  the page is scrolled down: go back to the top
 //   "minimize"    anything else: send the app to the background
 export function backAction(state) {
-  // TODO (learner): write this.
+  if (state.aiRunning) {
+    return "cancel-ai";
+  }
+  if (state.scrollTop > 0) {
+    return "scroll-top";
+  }
+  return "minimize";
 }
