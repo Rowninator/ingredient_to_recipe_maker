@@ -79,6 +79,7 @@ Done by a subagent. Claude re-checked the versions, the audit status and the bac
    - Claude writes failing tests and an empty starting version of a small pure function (a shared ES module with no Capacitor imports, so Node can test it). It takes the app's state and returns what Back should do.
    - The cases come from step 2's research.
    - The learner writes the function. Claude wires it to `@capacitor/app`'s `backButton` event and checks every case in the emulator.
+   - **Done so far (2026-10-27):** `backAction(state)` in `back.js`, with `state` = `{ aiRunning, scrollTop }`. It returns `"cancel-ai"`, `"scroll-top"` or `"minimize"`, checked in that order. Any `scrollTop` above 0 counts as scrolled, and 0 or less counts as the top. `back.test.js` has 8 tests: 7 fail on the stub, and "doesn't change the state" passes trivially. All 8 pass against a private reference kept in the scratchpad. While they fail, the test hook reports them after every code edit, which is expected. `@capacitor/app` 8.1.2 is installed when the wiring is done.
 7. **Interface audit (emulator).** Screenshots are the check. Covers:
    - the status bar and edge-to-edge layout (safe areas)
    - the keyboard covering the input

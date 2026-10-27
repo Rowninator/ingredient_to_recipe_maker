@@ -9,7 +9,7 @@ This repo is built in `/app-coach` lessons. The learner writes certain functions
 - `savePantry` and `loadPantry` in `pantry.js` (Level 2)
 - `buildPrompt` and `checkSuggestions` in `suggest.js` (Level 3)
 - `contrastRatio` in `contrast.js` (Level 4). `theme.css` is written by Claude.
-- The back-navigation function (Level 5, `ANDROID.md` step 6). Claude wires it to the back button.
+- `backAction` in `back.js` (Level 5, `ANDROID.md` step 6). Claude wires it to the back button.
 
 Give the smallest useful hint instead (the failing test, the line, or the concept to look up).
 
