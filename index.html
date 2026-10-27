@@ -203,13 +203,19 @@
     }
 
     // Tapping anywhere on a chip works; the inner button gives keyboard and
-    // screen-reader users the same action (its click bubbles to the chip).
+    // screen-reader users the same action (its click bubbles up). The chip
+    // sits in a 48px-tall tap area, Android's minimum, while the pill itself
+    // stays 36px (Ionic clips anything outside the pill, hence the wrapper).
+    function chipTapArea(onclick, chip) {
+      return el("span", { className: "chip-tap", onclick }, [chip]);
+    }
+
     function suggestionChips(count) {
       const picks = popular.filter((p) => !have.some((h) => sameIngredient(h, p))).slice(0, count);
       return el("div", { className: "chips" }, picks.map((p, i) =>
-        el("ion-chip", { className: "chip suggest", onclick: () => addSuggestion(p, i) }, [
+        chipTapArea(() => addSuggestion(p, i), el("ion-chip", { className: "chip suggest" }, [
           el("button", { type: "button", className: "chip-label", textContent: p }),
-        ])
+        ]))
       ));
     }
 
@@ -353,10 +359,10 @@
       pantry.hidden = have.length === 0;
       updateAiBtn();
       chipsEl.replaceChildren(...have.map((name) =>
-        el("ion-chip", { className: "chip", onclick: () => remove(name) }, [
+        chipTapArea(() => remove(name), el("ion-chip", { className: "chip" }, [
           el("span", { textContent: name }),
           el("button", { type: "button", className: "chip-x", ariaLabel: `Remove ${name}`, textContent: "×" }),
-        ])
+        ]))
       ));
 
       if (have.length === 0) {
@@ -407,6 +413,13 @@
         if (action === "cancel-ai") resetAi();
         else if (action === "scroll-top") content.scrollToTop(reduceMotion.matches ? 0 : 300);
         else App.minimizeApp();
+      });
+
+      // Capacitor picks light or dark status bar icons at launch and keeps them
+      // if dark mode changes while the app is open, so ask it to pick again.
+      const { SystemBars, SystemBarsStyle } = await import("@capacitor/core");
+      matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => {
+        SystemBars.setStyle({ style: SystemBarsStyle.Default });
       });
     }
   </script>

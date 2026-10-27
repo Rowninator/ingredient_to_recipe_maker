@@ -32,7 +32,10 @@ section + section { margin-top: var(--pm-gap-l); }
 .section-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: var(--pm-gap-m); }
 h2 { margin: 0; font-size: 1.0625rem; font-weight: 700; color: var(--pm-text); }
 .hint { margin: 6px 0 0; font-size: .8125rem; color: var(--pm-muted); }
+/* 48px tall to tap (Android's minimum); the negative margins keep the
+   heading row at the height of the text. */
 .link-btn {
+  min-height: 48px; margin: -8px 0;
   background: none; border: 0; padding: 8px 0 8px 12px; cursor: pointer;
   font: inherit; font-size: .875rem; font-weight: 600; color: var(--pm-link);
 }
@@ -104,7 +107,11 @@ ion-button.ai-btn.is-busy {
 .save-note.is-error .icon-error { display: inline; }
 
 /* --- Chips --- */
-.chips { display: flex; flex-wrap: wrap; gap: var(--pm-gap-s); }
+/* Each chip's tap area adds 6px above and below the 36px pill (48px, Android's
+   minimum). Rows sit directly on each other, and the negative margin keeps the
+   space around the group as before. */
+.chips { display: flex; flex-wrap: wrap; gap: 0 var(--pm-gap-s); margin: -6px 0; }
+.chip-tap { display: inline-flex; padding: 6px 0; cursor: pointer; }
 ion-chip.chip {
   --background: var(--pm-chip-bg);
   --color: var(--pm-chip-text);

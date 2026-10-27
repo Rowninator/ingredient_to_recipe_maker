@@ -100,6 +100,24 @@ Done by a subagent. Claude re-checked the versions, the audit status and the bac
    - the save note when storage fails
 
    Each finding is reported as issue, location, why it matters and fix, most serious first. The learner chooses which to fix.
+   - **Done (2026-10-27).** Checked on the API 37 emulator (411×914 CSS px).
+   - **Passed:**
+     - **Safe areas:** they are 24px top and bottom, and at full scroll the last line ends above the gesture bar (`.page` already pads `env(safe-area-inset-bottom)`). The `Error injecting safe area CSS` log at some launches is Capacitor setting the values before the page exists; it sets them correctly right after.
+     - **Keyboard:** the input stays visible.
+     - **Landscape:** no sideways scroll, and the pantry and AI cards are kept.
+     - **TalkBack:** labels, headings and reading order are right (read from the accessibility tree), and the live regions announce updates.
+     - **Dark mode,** including the "Clear all" dialog.
+     - **200% font:** no clipped text.
+     - **No network:** shows "Can't reach the AI right now…".
+     - **Blocked save:** shows "Couldn't save on this device".
+   - **Fixed (both chosen by the learner):**
+     1. **Touch targets.** "Clear all" was 63×32 and the chips were 36 tall, below Android's 48dp ([Touch target size](https://support.google.com/accessibility/android/answer/7101858)). A mis-tap on a chip removes an item.
+        - Clear all is now 48 tall, with negative margins so the heading row's layout doesn't change.
+        - Each chip sits in a `.chip-tap` wrapper that holds the tap handler and adds 6px above and below (48 tall). The pill itself stays 36px, because Ionic's chip clips anything outside it.
+        - The visible gap between chip rows grew from 8px to 12px.
+        - Checked in the app (a tap 2px outside the pill removes the item) and on the website.
+     2. **Status bar icons after a theme switch.** They stayed dark when dark mode turned on while the app was open, because Capacitor re-applies the style it chose at launch (`SystemBars.java` `handleOnConfigurationChanged`). The app build now calls `SystemBars.setStyle({ style: Default })` when `prefers-color-scheme` changes. Checked both ways in the emulator.
+   - **Not covered:** spoken TalkBack output, and a camera cutout in landscape (this emulator has none).
 8. **Release checklist (`RELEASE.md`).**
    - App ID, `versionCode` / `versionName`, icon and splash screen.
    - The signing keystore is kept outside the repo, with passwords not stored in git, and it is backed up. Play App Signing is used as the research describes.
