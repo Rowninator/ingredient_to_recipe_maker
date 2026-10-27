@@ -97,10 +97,11 @@
       }));
     }
 
-    // The AI proxy (worker/): the deployed Worker on the live site, otherwise
-    // the local one from `wrangler dev`. Both addresses are public; the key is
-    // in neither.
+    // The AI proxy (worker/): the deployed Worker on the live site and in the
+    // Android app (`--mode android`), otherwise the local one from
+    // `wrangler dev`. Both addresses are public; the key is in neither.
     const PROXY_URL = location.origin === "https://rowninator.github.io"
+      || import.meta.env.MODE === "android"
       ? "https://pantry-match-ai.rowninator.workers.dev"
       : "http://localhost:8787";
     // Longer than the Worker's 15 s limit, so its own 504 usually arrives first.

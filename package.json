@@ -6,13 +6,18 @@
   "scripts": {
     "start": "vite",
     "build": "vite build",
+    "build:android": "vite build --mode android",
+    "android": "npm run build:android && cap sync android",
     "preview": "vite preview",
     "test": "node --test \"*.test.js\""
   },
   "dependencies": {
+    "@capacitor/android": "8.5.3",
+    "@capacitor/core": "8.5.3",
     "@ionic/core": "9.0.6"
   },
   "devDependencies": {
+    "@capacitor/cli": "8.5.3",
     "vite": "8.3.3",
     "vite-plugin-static-copy": "4.1.1"
   }

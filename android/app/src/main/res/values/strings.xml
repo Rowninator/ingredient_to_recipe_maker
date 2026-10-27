@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Pantry Match</string>
+    <string name="title_activity_main">Pantry Match</string>
+    <string name="package_name">io.github.rowninator.pantrymatch</string>
+    <string name="custom_url_scheme">io.github.rowninator.pantrymatch</string>
+</resources>

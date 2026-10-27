@@ -2,6 +2,13 @@ node_modules/
 
 # Vite's build output (deployed by GitHub Actions, never committed)
 dist/
+# The Android app's build (`npm run build:android`), copied into android/ by cap sync
+dist-android/
+
+# Android signing keys and their passwords. Never commit these.
+*.jks
+*.keystore
+keystore.properties
 
 # Worker secrets for `wrangler dev` (the Gemini key). Never commit these.
 worker/.dev.vars

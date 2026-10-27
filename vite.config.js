@@ -2,9 +2,13 @@ import { defineConfig } from 'vite';
 import { viteStaticCopy } from 'vite-plugin-static-copy';
 
 // Choices and doc links: DESIGN.md, "Research decisions".
-export default defineConfig({
-  // The live site is a GitHub Pages project site.
-  base: '/ingredient_to_recipe_maker/',
+// `--mode android` builds the Capacitor app (ANDROID.md step 4).
+export default defineConfig(({ mode }) => ({
+  // The live site is a GitHub Pages project site; the app serves its files
+  // from the root of https://localhost/.
+  base: mode === 'android' ? '/' : '/ingredient_to_recipe_maker/',
+  // A folder of its own, so a site build is never packaged into the app.
+  build: { outDir: mode === 'android' ? 'dist-android' : 'dist' },
   server: {
     // The local Worker only accepts http://localhost:3000 (DEV_ORIGIN).
     port: 3000,
@@ -33,4 +37,4 @@ export default defineConfig({
       }],
     }),
   ],
-});
+}));
