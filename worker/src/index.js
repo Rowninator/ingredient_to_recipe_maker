@@ -8,6 +8,11 @@ import { readReply } from "../../reply.js";
 
 const MODEL = "gemini-3.5-flash-lite";
 const PROD_ORIGIN = "https://rowninator.github.io";
+// The Android app (Capacitor's default address, seen in the app on
+// 2026-10-27). Every Capacitor Android app uses it, so it doesn't prove the
+// request came from Pantry Match: the rate limit and billing being off are
+// what limit misuse (REVIEW.md).
+const APP_ORIGIN = "https://localhost";
 const TIMEOUT_MS = 15000;
 // Gemini's 503 (busy) is temporary, so it gets up to 2 retries with a short
 // backoff (0.5-1 s, then 1-2 s). TIMEOUT_MS still covers the whole call.
@@ -120,9 +125,10 @@ function getClient(env) {
 }
 
 // DEV_ORIGIN is set only in worker/.dev.vars, so the deployed Worker
-// allows just the live site.
+// allows just the live site and the app.
 function allowedOrigins(env) {
-  return env.DEV_ORIGIN ? [PROD_ORIGIN, env.DEV_ORIGIN] : [PROD_ORIGIN];
+  const origins = [PROD_ORIGIN, APP_ORIGIN];
+  return env.DEV_ORIGIN ? [...origins, env.DEV_ORIGIN] : origins;
 }
 
 // The body must be {"pantry": [...]} with 1-40 strings of at most 40

@@ -44,6 +44,32 @@ async function askWorker(pantry = ["eggs", "cheese"]) {
   return { status: response.status, body: await response.json() };
 }
 
+// A CORS preflight from the given Origin (null sends no Origin header).
+function preflight(origin, testEnv = env) {
+  const headers = origin === null ? {} : { Origin: origin };
+  return worker.fetch(new Request("https://worker.test/", { method: "OPTIONS", headers }), testEnv);
+}
+
+test("Worker allows the Android app's origin", async () => {
+  const response = await preflight("https://localhost");
+  assert.equal(response.status, 204);
+  assert.equal(response.headers.get("Access-Control-Allow-Origin"), "https://localhost");
+});
+
+test("Worker refuses origins that only look like the app's, without CORS headers", async () => {
+  for (const origin of ["http://localhost", "https://localhost:3000", "https://evil.example", null]) {
+    const response = await preflight(origin);
+    assert.equal(response.status, 403, `${origin} should be refused`);
+    assert.equal(response.headers.get("Access-Control-Allow-Origin"), null);
+  }
+});
+
+test("Worker refuses the dev origin unless DEV_ORIGIN is set", async () => {
+  assert.equal((await preflight("http://localhost:3000")).status, 403);
+  const devEnv = { ...env, DEV_ORIGIN: "http://localhost:3000" };
+  assert.equal((await preflight("http://localhost:3000", devEnv)).status, 204);
+});
+
 const GOOD_REPLY = JSON.stringify({
   recipes: [{
     name: "Cheesy Egg Scramble",
