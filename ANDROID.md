@@ -80,6 +80,15 @@ Done by a subagent. Claude re-checked the versions, the audit status and the bac
    - The cases come from step 2's research.
    - The learner writes the function. Claude wires it to `@capacitor/app`'s `backButton` event and checks every case in the emulator.
    - **Done so far (2026-10-27):** `backAction(state)` in `back.js`, with `state` = `{ aiRunning, scrollTop }`. It returns `"cancel-ai"`, `"scroll-top"` or `"minimize"`, checked in that order. Any `scrollTop` above 0 counts as scrolled, and 0 or less counts as the top. `back.test.js` has 8 tests: 7 fail on the stub, and "doesn't change the state" passes trivially. All 8 pass against a private reference kept in the scratchpad. While they fail, the test hook reports them after every code edit, which is expected. `@capacitor/app` 8.1.2 is installed when the wiring is done.
+   - **Done (2026-10-27):** the learner wrote `backAction` on their own (8/8). `@capacitor/app` 8.1.2 is installed, and Claude wired the function in `index.html`. Only the `--mode android` build loads the plugin, through a dynamic import, so the website bundle has no Capacitor code (checked). Cancel reuses `resetAi()`. Scroll-to-top uses Ionic's `scrollToTop` (no animation with reduced motion). Minimize uses `App.minimizeApp()`.
+   - **Emulator checks with real Back presses, all passed:**
+     - **Scrolled:** scrolls to the top and stays in the app.
+     - **At the top:** the app goes to the background, and reopening it brings back the same pantry.
+     - **AI running:** the loading line clears and the button resets, and nothing appears 8 s later.
+     - **Keyboard open:** only the keyboard closes.
+     - **"Clear all" dialog:** the dialog closes and the pantry is kept.
+     - **AI running and scrolled:** three presses do cancel → scroll up → minimize.
+     - No new console errors.
 7. **Interface audit (emulator).** Screenshots are the check. Covers:
    - the status bar and edge-to-edge layout (safe areas)
    - the keyboard covering the input

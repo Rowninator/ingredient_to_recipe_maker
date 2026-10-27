@@ -82,6 +82,7 @@
     import { parseIngredients } from "./parse.js";
     import { savePantry, loadPantry } from "./pantry.js";
     import { checkSuggestions } from "./suggest.js";
+    import { backAction } from "./back.js";
 
     // One look on every device (see DESIGN.md). Ionic is loaded at runtime from
     // the base path, as in Ionic's JS quickstart. Without it the input and
@@ -391,6 +392,23 @@
     aiBtn.addEventListener("click", suggestWithAi);
 
     render();
+
+    // Android's Back button (ANDROID.md step 6). Only the app build has it, so
+    // the website never loads @capacitor/app. Back never reaches us while the
+    // keyboard or the Clear all dialog is open: Android closes those itself.
+    if (import.meta.env.MODE === "android") {
+      const { App } = await import("@capacitor/app");
+      const content = document.querySelector("ion-content");
+      const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)");
+      App.addListener("backButton", async () => {
+        // If Ionic didn't load, there's no scroll element: treat it as the top.
+        const scroller = await content.getScrollElement?.();
+        const action = backAction({ aiRunning: aiBusy, scrollTop: scroller?.scrollTop ?? 0 });
+        if (action === "cancel-ai") resetAi();
+        else if (action === "scroll-top") content.scrollToTop(reduceMotion.matches ? 0 : 300);
+        else App.minimizeApp();
+      });
+    }
   </script>
 </body>
 </html>
