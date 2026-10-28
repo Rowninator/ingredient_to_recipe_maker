@@ -129,5 +129,9 @@ Done by a subagent. Claude re-checked the versions, the audit status and the bac
      - **Written:** `design/icon-foreground.svg` and `RELEASE.md`.
      - **Left for the learner:** the contact email, the icon, the keystore and its backup.
 9. **Checkpoint.** `npm test`, the Worker's tests, a key check of `dist/` and `android/`, `/code-review` in a fresh session, fixes, and a commit.
+   - **Re-audit on the final build (after the icon), first:** rerun step 7's checks on a fresh `npm run android` build. Show the learner a screenshot for each check. Two of them come from earlier notes:
+     - **"Clear all" dialog with the emulator in dark mode.** Claude reported a light `confirm()` dialog in dark mode at the end of step 6, and step 7 recorded it as passing without showing a screenshot. Test it directly and show the screenshot.
+     - **The bottom of the page at full scroll.** Step 4 saw the gesture bar overlap the bottom text and logged `Error injecting safe area CSS`. The step 8 footer link is now the last line. Show the screenshot, plus whether the log line appears at that launch.
+   - Also: the launcher icon, the launch screen (light and dark) and Settings → Apps.
 10. **Security gate.** All four items above, before any build is uploaded.
 11. **Release.** Build the signed `.aab`. The learner uploads it to internal testing and installs it on their phone from Play. Claude checks it on the phone with the learner (the AI request, saving the pantry, Back).
