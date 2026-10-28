@@ -170,4 +170,16 @@ Done by a subagent. Claude re-checked the versions, the audit status and the bac
        6. `SystemBars.setStyle` now has a `.catch()`.
      - **Left as is:** Back during an AI request still cancels silently (the step 2 decision). The `https://localhost` origin is already accepted in REVIEW.md, and the step 10 gate now has a fifth item: the learner confirms billing is still off.
 10. **Security gate.** All five items above, before any build is uploaded.
+   - **Item 1, passed (2026-10-28, commit `b4f7908`, clean tree):**
+     - **Key:** the API key is only in `worker/.dev.vars`, which is ignored and was never committed. It isn't in the folder, in fresh `dist/` and `dist-android/` builds, in `.wrangler`, or in any git commit or stored object, including unreachable ones. Nothing shaped like a Google key appears either.
+     - **Keystore:** no keystore-type files (`.jks`, `.keystore`, `.p12`, `.pfx`, `keystore.properties`) are in the folder or any commit. The keystore itself isn't in git's object store, and no file matches it byte for byte. No signing settings or passwords are in Gradle, properties, XML or `.idea` files, or in history.
+     - **Name:** the upload key was renamed to `C:\Users\jadee\keys\pantrymatch_upload.jks` (outside the repo) so the root `*.jks` ignore covers it.
+   - **Item 2, passed (2026-10-28):** the learner inspected the debug build of `b4f7908` on the emulator through `chrome://inspect`.
+     - **Request:** the POST goes to the `workers.dev` address with Origin `https://localhost`. It carries no `x-goog-api-key`, no `Authorization` and no `key=`, and its payload is only the pantry list.
+     - **Searches:** in network headers and bodies, and in the loaded code, there are no matches for `AIza`, `AQ.` or the start of the real key. `key` only matches ordinary words.
+     - **Storage:** local storage holds only `pantry-match:pantry`.
+   - **Item 3, passed (2026-10-28):** REVIEW.md's "Level 5: the upload key" section covers where the key lives (outside the repo, with an encrypted off-device backup) and that only the learner has the passwords, in a password manager. It also covers the git ignore backstop, and losing or leaking the key (an upload key reset through Play App Signing; the app signing key is unaffected). Claude checked it against the item 1 results.
+   - **Item 5, passed (2026-10-28):** the learner confirmed billing is still off for the Google project that owns the Gemini key.
+   - **Item 4, passed (2026-10-28):** the learner confirmed the mentor approved the updated REVIEW.md.
+   - **Gate passed (2026-10-28).** Pushing `main` and uploading the bundle are now allowed (step 11).
 11. **Release.** Build the signed `.aab`. The learner uploads it to internal testing and installs it on their phone from Play. Claude checks it on the phone with the learner (the AI request, saving the pantry, Back).

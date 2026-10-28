@@ -20,3 +20,14 @@ The Worker now also accepts `https://localhost`, the address the Android app sen
 Every Capacitor Android app uses the same address, so it does not prove a request came from *my* app. The rate limit allows 5 requests per minute per IP, and billing is off, so the worst case is using up the free quota, not costing money.
 
 Evidence: the running app sent `https://localhost`, and the old Worker returned 403. Worker tests returned 403 for `http://localhost`, `https://localhost:3000`, another site's Origin, and no Origin. A key search that included `android/` and `dist-android/` found 0 matches.
+
+
+## Level 5: the upload key
+
+The upload keystore is at `C:\Users\jadee\keys\pantrymatch_upload.jks`, outside the project folder. Keeping it outside the source tree keeps signing material separate from the app code. A second copy is kept in an encrypted off-device backup; its exact storage location is intentionally not recorded here.
+
+I'm the only person who knows the keystore and key passwords. They are kept in my password manager, not in this project, chat, Gradle settings, or a properties file. Android Studio's “Remember passwords” option is off, so the passwords are entered when a release bundle is signed.
+
+Git cannot add the original file through normal operations in this repository because it is outside the repository. If a keystore is accidentally copied into the project, `.gitignore` also excludes `*.jks` and `*.keystore` files; it excludes `keystore.properties` and the signed-bundle output directory too. These ignore rules guard against accidental additions, but are not a substitute for keeping the key outside the repo.
+
+Losing the keystore is recoverable because Google Play App Signing holds the app-signing key; this file is only the upload key. I would create a replacement upload key and ask Google Play to reset the upload key, then use the replacement for future uploads. If the keystore or its password is exposed, treat it as compromised and request that reset promptly. Google's reset process takes a support request and waiting; it does not require replacing the app-signing key.

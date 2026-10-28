@@ -24,8 +24,8 @@ Goal: a signed `.aab` in Google Play **internal testing**, installed on the lear
 - ☐ Public URL for Play Console: `https://rowninator.github.io/ingredient_to_recipe_maker/privacy.html`. It goes live when `main` is pushed (step 11, after the security gate). Open it in a browser before pasting it into Play.
 
 ## 4. Upload key (keystore)
-- ☐ **Learner** (Claude never sees the passwords): in Android Studio, **Build → Generate Signed App Bundle or APK → Android App Bundle → Create new…**
-  - **Key store path:** `C:\Users\jadee\keys\pantry-match-upload.jks`. This is **outside the repo**; never put it in the project folder.
+- ☑ **Learner** (Claude never sees the passwords; done 2026-10-28, with a backup copy): in Android Studio, **Build → Generate Signed App Bundle or APK → Android App Bundle → Create new…**
+  - **Key store path:** `C:\Users\jadee\keys\pantrymatch_upload.jks`. This is **outside the repo**; never put it in the project folder.
   - Set a strong store password and key password, with alias `upload` and validity 25 years or more. Fill in at least the first and last name in the certificate.
   - Save both passwords in a password manager. Don't type them into chat, a file or a commit.
   - **Back up the `.jks` file** somewhere other than this computer (an encrypted cloud folder or a USB drive). If it's lost, Google can reset the upload key, but that takes a support request and waiting ([Play App Signing](https://support.google.com/googleplay/android-developer/answer/9842756)).
