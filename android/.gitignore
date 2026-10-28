@@ -51,6 +51,10 @@ captures/
 .idea/modules.xml
 # Comment next line if keeping position of elements in Navigation Editor is relevant for you
 .idea/navEditor.xml
+# Studio settings for this computer (selected device, local JDK); Gradle doesn't need them
+.idea/compiler.xml
+.idea/deploymentTargetSelector.xml
+.idea/runConfigurations.xml
 
 # Keystore files
 # Uncomment the following lines if you do not want to check your keystore files in.

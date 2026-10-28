@@ -8,14 +8,14 @@ Goal: a signed `.aab` in Google Play **internal testing**, installed on the lear
 - ☐ **Learner:** `versionCode 1`, `versionName "1.0"` (`android/app/build.gradle`) for the first upload. **Every later upload needs a higher `versionCode`**, or Play rejects it.
 
 ## 2. Icon and launch screen
-- ☐ **Learner:** create the icon in Android Studio.
+- ☑ **Learner:** create the icon in Android Studio (done 2026-10-28).
   - Open `android/` in Android Studio, right-click `app` → **New → Image Asset** → **Launcher Icons (Adaptive and Legacy)**.
-  - Foreground layer: Asset type **Image**, path `design/icon-foreground.svg`. Resize until the leaf sits inside the safe-zone circle.
+  - Foreground layer: Asset type **Image**, path `design/icon-foreground.svg`. Leave Resize at 100%: the SVG is already padded so the leaf sits inside the safe-zone circle.
   - Background layer: **Color** `#16B96B` (the header logo's green, `--pm-logo`).
   - Options: Legacy icon **Yes**, Round icon **Yes**. Monochrome (themed icon): the same SVG.
   - Click **Next**, then **Finish**. It replaces Capacitor's default icon in every size.
 - ☑ Launch screen: Android shows the app icon on the page background (`#FBFAF5` light, `#111614` dark). This is set in `values/styles.xml` plus `values/` and `values-night/splash.xml`, so it picks up the new icon automatically.
-- ☐ **Claude:** after the icon is made, check the launcher, the launch screen (light and dark) and Settings → Apps in the emulator.
+- ☑ **Claude:** after the icon is made, check the launcher, the launch screen (light and dark) and Settings → Apps in the emulator (passed 2026-10-28, `ANDROID.md` step 9).
 
 ## 3. Privacy policy
 - ☑ `privacy.html` is built by Vite as a second page (`vite.config.js`). `build.test.js` checks it's in both builds.

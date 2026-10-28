@@ -133,5 +133,20 @@ Done by a subagent. Claude re-checked the versions, the audit status and the bac
      - **"Clear all" dialog with the emulator in dark mode.** Claude reported a light `confirm()` dialog in dark mode at the end of step 6, and step 7 recorded it as passing without showing a screenshot. Test it directly and show the screenshot.
      - **The bottom of the page at full scroll.** Step 4 saw the gesture bar overlap the bottom text and logged `Error injecting safe area CSS`. The step 8 footer link is now the last line. Show the screenshot, plus whether the log line appears at that launch.
    - Also: the launcher icon, the launch screen (light and dark) and Settings → Apps.
+   - **Re-audit done (2026-10-28).** On a clean debug build with the final icon (API 37 emulator, 411×914 CSS px), with screenshots shown to the learner.
+     - **Icon:** the first Image Asset run filled the whole 108dp layer, so launchers cropped the leaf. The SVG's viewBox now pads it to 60%: the farthest point is 30.5dp from the centre, inside the 33dp safe zone. The whole leaf now shows on the home screen, in the app drawer and in Settings → Apps.
+     - **Launch screen:** the leaf icon on `#FBFAF5` in light mode and `#111614` in dark mode.
+     - **"Clear all" dialog:** dark in dark mode, both when the app starts in dark and when dark mode turns on while the app is open. Step 6's screenshot shows the emulator was in light mode then, so Claude's step 6 "light in dark mode" report was wrong.
+     - **Bottom at full scroll:** the "Privacy policy" link ends at 867 of 914 CSS px, above the 24px gesture area, at 100% and 200% font. Mid-scroll text passing under the gesture bar is normal. `Error injecting safe area CSS` didn't appear in 7 cold launches; the inset was 24px.
+     - **Also passed again:**
+       - keyboard (the input stays visible);
+       - landscape (no sideways scroll, pantry kept);
+       - touch targets: Clear all, chips and the footer link are 48 tall, Add and the input are 50;
+       - accessibility tree (labels and headings);
+       - 200% font (no clipped text);
+       - offline message;
+       - failed-save note;
+       - status bar icons after a theme switch, both ways.
+     - **Noted, not ours:** Settings lists "Nearby devices" under Permissions. The installed app requests `ACCESS_LOCAL_NETWORK`, which isn't in our merged manifest (only `INTERNET`), so it comes from Android 17 itself. It isn't granted. Check what the phone shows in step 11.
 10. **Security gate.** All four items above, before any build is uploaded.
 11. **Release.** Build the signed `.aab`. The learner uploads it to internal testing and installs it on their phone from Play. Claude checks it on the phone with the learner (the AI request, saving the pantry, Back).
