@@ -15,11 +15,12 @@ Approved 2026-10-26. Pantry Match is packaged as an Android app with Capacitor a
 The Level 3 gate applies again, at two points:
 
 - **Before the Worker is redeployed (step 5):** the key search is re-run, REVIEW.md is updated for the app's address (see step 5), and the learner's mentor approves it.
-- **Before any build is uploaded (step 10):** all four items, with the Level 5 changes:
+- **Before any build is uploaded (step 10):** all five items, with the Level 5 changes:
   1. Claude confirms the API key is not in the code or git history, and the file holding it is in `.gitignore`. Claude also confirms the keystore and its passwords are not in the code or git history.
   2. The learner inspects the installed app's traffic through Chrome's remote inspection (`chrome://inspect`) and confirms the key never appears.
   3. REVIEW.md covers the app's address and the keystore (where it lives, who has the passwords, what happens if it's lost).
   4. The learner confirms the mentor approved REVIEW.md.
+  5. The learner confirms billing is still off for the Google project that owns the Gemini key, since allowing `https://localhost` relies on the free tier's limits (REVIEW.md).
 
 ## Research decisions (step 2, 2026-10-26)
 
@@ -52,6 +53,13 @@ Done by a subagent. Claude re-checked the versions, the audit status and the bac
   - New personal accounts need a 12-tester, 14-day closed test only before production, not for internal testing. [Testing requirements](https://support.google.com/googleplay/android-developer/answer/14151465)
 - **Audit finding:** the `braces` advisory was withdrawn on 2026-10-23, and `npm audit` reports 0 vulnerabilities. `vite-plugin-static-copy` 4.1.1 is still the latest release, so there's no update to take. [GHSA-vfj7-8cjw-p6xm](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm)
 - **Accepted audit finding (step 4, 2026-10-26):** after `@capacitor/cli` 8.5.3 was installed, `npm audit` reports 3 moderate findings. `uuid` below 11.1.1 is missing a buffer bounds check in v3/v5/v6 when a buffer is passed ([GHSA-w5hq-g745-h8pq](https://github.com/advisories/GHSA-w5hq-g745-h8pq)). It comes in through `xcode`, the CLI's iOS project tool. The CLI only runs on this machine at build time, and we don't build for iOS. npm's only fix downgrades the CLI to 8.4.3, which wouldn't match core and android 8.5.3. The learner accepted it. Re-check before the release build (step 9).
+- **Accepted audit finding (step 9, 2026-10-28), until 9 November 2026:**
+  - **What:** `cd worker && npm audit` reports 1 high and 2 moderate findings, all in `undici` 7.x through `miniflare` in `wrangler` 4.149.0. They include denial of service and TLS certificate validation bypass ([GHSA-2m5v-pch6-74hx](https://github.com/advisories/GHSA-2m5v-pch6-74hx), [GHSA-4w7w-5xrc-9h26](https://github.com/advisories/GHSA-4w7w-5xrc-9h26) and others).
+  - **Scope:** `wrangler` only runs on this machine (`wrangler dev`, `wrangler deploy`). The deployed Worker doesn't include `undici`.
+  - **Why accepted:** the fix needs `wrangler` 4.153.0 or later, released 2026-10-26. It meets the "at least two weeks old" rule from 9 November. The learner accepted it until then. Conditions:
+    1. Until then, don't run `wrangler dev` or `wrangler deploy` on public Wi-Fi.
+    2. On or after 9 November, update `wrangler` to the newest version that's at least two weeks old, then rerun `cd worker && npm audit` and `npm test`.
+    3. In the same change, pin every package in `worker/package.json` to an exact version (no `^`), like the root `package.json`. Commit the updated `worker/package-lock.json` with it.
 - **Edge-to-edge:** targeting API 36 always draws the app under the system bars. Capacitor 8's SystemBars sets `--safe-area-inset-*`, and Ionic's `--ion-safe-area-*` uses them. `viewport-fit=cover` is already set. Step 7 checks the header, the status bar icon contrast in light and dark, and any custom padding at the screen edges (which should use `var(--ion-safe-area-*)`). [System Bars](https://capacitorjs.com/docs/apis/system-bars)
 
 ## Steps
@@ -148,5 +156,18 @@ Done by a subagent. Claude re-checked the versions, the audit status and the bac
        - failed-save note;
        - status bar icons after a theme switch, both ways.
      - **Noted, not ours:** Settings lists "Nearby devices" under Permissions. The installed app requests `ACCESS_LOCAL_NETWORK`, which isn't in our merged manifest (only `INTERNET`), so it comes from Android 17 itself. It isn't granted. Check what the phone shows in step 11.
-10. **Security gate.** All four items above, before any build is uploaded.
+   - **Checkpoint (2026-10-28):**
+     - **Tests:** 169 site tests and 7 Worker tests pass.
+     - **Key and keystore search:** run over fresh `dist/` and `dist-android/` builds, `android/` and all of git history. No key, nothing shaped like a key, and no keystore files.
+     - **Release merged manifest:** only `INTERNET` and AndroidX's own receiver permission, with no `ACCESS_LOCAL_NETWORK`.
+     - **`npm audit`:** the site has only the accepted `uuid` finding. The Worker's `undici` finding is accepted until 9 November (Research decisions).
+     - **`/code-review`:** run in a fresh session; 8 findings. Fixed (the learner's choice):
+       1. Android backup copied the pantry off the device. Now `allowBackup="false"` plus `res/xml/data_extraction_rules.xml`, which excludes every domain from cloud backup and from phone-to-phone transfer ([Auto Backup](https://developer.android.com/identity/data/autobackup)). On the emulator, `bmgr backupnow` reports "Backup is not allowed". The phone-to-phone rules can't be tested on one emulator.
+       2. `privacy.html` said no device details are sent. It now says standard connection information (IP address, and a browser identifier with the Android version and device model) comes with each request and the Worker doesn't store or log it. The Data safety draft in `RELEASE.md` matches.
+       3. `build.test.js` now checks that the Android bundle calls the deployed Worker and never `localhost:8787`.
+       4. The template's two example tests were deleted (one expected `com.getcapacitor.app`).
+       5. The unused `FileProvider` and `file_paths.xml` were removed. Only Capacitor's camera capture through a file input uses them, and the app has none.
+       6. `SystemBars.setStyle` now has a `.catch()`.
+     - **Left as is:** Back during an AI request still cancels silently (the step 2 decision). The `https://localhost` origin is already accepted in REVIEW.md, and the step 10 gate now has a fifth item: the learner confirms billing is still off.
+10. **Security gate.** All five items above, before any build is uploaded.
 11. **Release.** Build the signed `.aab`. The learner uploads it to internal testing and installs it on their phone from Play. Claude checks it on the phone with the learner (the AI request, saving the pantry, Back).

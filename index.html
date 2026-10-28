@@ -423,7 +423,7 @@
       // if dark mode changes while the app is open, so ask it to pick again.
       const { SystemBars, SystemBarsStyle } = await import("@capacitor/core");
       matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => {
-        SystemBars.setStyle({ style: SystemBarsStyle.Default });
+        SystemBars.setStyle({ style: SystemBarsStyle.Default }).catch(() => {});
       });
     }
   </script>

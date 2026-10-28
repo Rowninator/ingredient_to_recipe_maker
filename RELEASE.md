@@ -55,6 +55,8 @@ Goal: a signed `.aab` in Google Play **internal testing**, installed on the lear
   - It's sent over HTTPS.
   - Users choose when to send it.
   - Deleting it from the app deletes it on the device.
+  - It isn't backed up: Android backup and phone-to-phone transfer are off (`allowBackup="false"` and `res/xml/data_extraction_rules.xml`).
+  - Standard connection information (the IP address, and the browser identifier with the Android version and device model) comes with each AI request. The Worker uses the IP only for the 5-a-minute limit and doesn't store or log either. Before filling in a later track, check Play's Data safety guidance on whether this counts as "collected".
 - ☐ **Internal testing:**
   - Create a release and upload the `.aab`.
   - Release notes: "First test build".
@@ -62,11 +64,12 @@ Goal: a signed `.aab` in Google Play **internal testing**, installed on the lear
   - Save and publish, then open the **opt-in link** on your phone and install from Play.
 
 ## 7. Before upload: security gate (ANDROID.md step 10)
-All four, in order:
+All five, in order:
 1. **Claude:** no key, keystore or keystore password in the code or git history.
 2. **Learner:** check the debug build's traffic in `chrome://inspect`; the key never appears.
 3. REVIEW.md covers the app's address and the keystore.
 4. The mentor approves REVIEW.md.
+5. **Learner:** confirm billing is still off for the Google project that owns the Gemini key, since allowing `https://localhost` relies on the free tier's limits (REVIEW.md).
 
 ## 8. After install (step 11)
 - ☐ **Learner + Claude**, on the phone, installed from Play:

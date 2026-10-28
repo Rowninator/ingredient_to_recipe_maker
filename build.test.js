@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { mkdtempSync, readFileSync, existsSync, rmSync } from "node:fs";
+import { mkdtempSync, readFileSync, readdirSync, existsSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { fileURLToPath } from "node:url";
@@ -30,6 +30,22 @@ for (const [mode, base] of [["production", "/ingredient_to_recipe_maker/"], ["an
     }
   });
 }
+
+// The app has no local Worker to fall back on, so its bundle must call the
+// deployed one (PROXY_URL in index.html).
+test("the android build calls the deployed Worker, never the local one", async () => {
+  const outDir = await buildMode("android");
+  try {
+    const js = readdirSync(join(outDir, "assets"))
+      .filter((f) => f.endsWith(".js"))
+      .map((f) => readFileSync(join(outDir, "assets", f), "utf8"))
+      .join("\n");
+    assert.match(js, /https:\/\/pantry-match-ai\.rowninator\.workers\.dev/);
+    assert.doesNotMatch(js, /localhost:8787/);
+  } finally {
+    rmSync(outDir, { recursive: true, force: true });
+  }
+});
 
 test("the privacy page has a real contact email, not the placeholder", () => {
   const page = readFileSync(join(root, "privacy.html"), "utf8");
