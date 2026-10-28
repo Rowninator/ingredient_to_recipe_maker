@@ -16,7 +16,12 @@
     </style>
 
 
+    <!-- Launch screen: the app icon on the page background (values-night has the
+         dark colour). Android 12+ draws this itself; the SplashScreen library
+         does the same on older versions. Capacitor then switches to
+         AppTheme.NoActionBar. (ANDROID.md step 8) -->
     <style name="AppTheme.NoActionBarLaunch" parent="Theme.SplashScreen">
-        <item name="android:background">@drawable/splash</item>
+        <item name="windowSplashScreenBackground">@color/splash_background</item>
+        <item name="postSplashScreenTheme">@style/AppTheme.NoActionBar</item>
     </style>
 </resources>

@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="432" height="432">
+  <!-- The header logo's leaf (index.html), white on transparent, for Android
+       Studio's Image Asset wizard: foreground layer, background colour #16B96B
+       (--pm-logo). Also usable as the monochrome (themed icon) layer. -->
+  <path fill="#FFFFFF" d="M20 4c-8 0-14 4-14 11 0 1.4.3 2.6.8 3.6L5 20.4l1.4 1.4 1.8-1.8c1 .6 2.3 1 3.8 1 6 0 8-6 8-13V4z"/>
+</svg>

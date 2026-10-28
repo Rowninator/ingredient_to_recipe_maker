@@ -123,6 +123,11 @@ Done by a subagent. Claude re-checked the versions, the audit status and the bac
    - The signing keystore is kept outside the repo, with passwords not stored in git, and it is backed up. Play App Signing is used as the research describes.
    - Target SDK, Data safety answers (the pantry is sent to Google's AI through the Worker), and internal testing track setup.
    - **Privacy policy page:** a page in the Vite build (for example `privacy.html` as a second build input), so the Actions deploy publishes it at `https://rowninator.github.io/ingredient_to_recipe_maker/privacy.html`. Pages serves only the built site. A test or build check confirms it's in `dist/`.
+   - **Progress (2026-10-27):**
+     - **Learner's choices:** a contact email they provide, the icon made with Android Studio's Image Asset, and the upload key made in Android Studio's wizard with no passwords in any file.
+     - **Done:** `privacy.html` (built in both modes, with `build.test.js`), a footer link opening the packaged copy in the app (checked in the emulator: it opens offline, and Back returns), and the launch screen set to the icon on the page background.
+     - **Written:** `design/icon-foreground.svg` and `RELEASE.md`.
+     - **Left for the learner:** the contact email, the icon, the keystore and its backup.
 9. **Checkpoint.** `npm test`, the Worker's tests, a key check of `dist/` and `android/`, `/code-review` in a fresh session, fixes, and a commit.
 10. **Security gate.** All four items above, before any build is uploaded.
 11. **Release.** Build the signed `.aab`. The learner uploads it to internal testing and installs it on their phone from Play. Claude checks it on the phone with the learner (the AI request, saving the pantry, Back).

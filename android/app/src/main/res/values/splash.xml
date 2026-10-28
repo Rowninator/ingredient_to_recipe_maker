@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- pm-bg in theme.css (light) -->
+    <color name="splash_background">#FBFAF5</color>
+</resources>

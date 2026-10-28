@@ -7,8 +7,13 @@ export default defineConfig(({ mode }) => ({
   // The live site is a GitHub Pages project site; the app serves its files
   // from the root of https://localhost/.
   base: mode === 'android' ? '/' : '/ingredient_to_recipe_maker/',
-  // A folder of its own, so a site build is never packaged into the app.
-  build: { outDir: mode === 'android' ? 'dist-android' : 'dist' },
+  build: {
+    // A folder of its own, so a site build is never packaged into the app.
+    outDir: mode === 'android' ? 'dist-android' : 'dist',
+    // The privacy policy is a second page, so Pages publishes it and the app
+    // can show it offline (ANDROID.md step 8).
+    rolldownOptions: { input: { main: 'index.html', privacy: 'privacy.html' } },
+  },
   server: {
     // The local Worker only accepts http://localhost:3000 (DEV_ORIGIN).
     port: 3000,

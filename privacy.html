@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Privacy policy · Pantry Match</title>
+  <!-- A plain page with no Ionic, so it loads fast and works without the app's
+       scripts. Built by Vite as a second page (vite.config.js), published by
+       GitHub Pages and also packaged into the Android app (ANDROID.md step 8). -->
+  <link rel="stylesheet" href="./theme.css">
+  <style>
+    body {
+      margin: 0; background: var(--pm-bg); color: var(--pm-text);
+      font-family: var(--pm-font); line-height: 1.55;
+    }
+    main {
+      max-width: 640px; margin: 0 auto;
+      padding: calc(var(--pm-gutter) + env(safe-area-inset-top)) var(--pm-gutter)
+        calc(var(--pm-gap-l) + env(safe-area-inset-bottom));
+    }
+    h1 { font-size: 1.5rem; color: var(--pm-title); margin: 0 0 4px; }
+    h2 { font-size: 1.0625rem; margin: var(--pm-gap-l) 0 6px; }
+    .updated { margin: 0; color: var(--pm-muted); font-size: .875rem; }
+    a { color: var(--pm-link); }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Privacy policy</h1>
+    <p class="updated">Pantry Match · last updated 27 October 2026</p>
+
+    <p>Pantry Match helps you find recipes from the ingredients you have. This page explains what happens to your ingredient list. In short: it stays on your device unless you tap "Suggest with AI".</p>
+
+    <h2>Your ingredient list</h2>
+    <p>The ingredients you add are saved only on your device, in the app's (or browser's) own storage, so they're still there next time. They are not sent anywhere when you add, remove or clear them. Removing items, tapping "Clear all" or uninstalling the app deletes them.</p>
+
+    <h2>AI suggestions</h2>
+    <p>Only when you tap "Suggest with AI", your ingredient list is sent to Pantry Match's small server (hosted by Cloudflare), which passes it to Google's Gemini API to get recipe ideas, then sends the ideas back to you. Nothing else is sent: no name, account, location or device details.</p>
+    <p>Pantry Match uses Gemini's free tier. Under <a href="https://ai.google.dev/gemini-api/terms">Google's Gemini API terms</a>, Google may use what's sent and the replies to improve its products, and human reviewers may read them after Google disconnects them from our account. Please only add ingredient names, never personal information.</p>
+    <p>Pantry Match's server does not store or log ingredient lists. To limit how often it can be used (5 requests a minute), it uses your IP address, which Cloudflare handles as the host (<a href="https://www.cloudflare.com/privacypolicy/">Cloudflare's privacy policy</a>).</p>
+
+    <h2>What Pantry Match doesn't do</h2>
+    <p>No accounts, ads, analytics or tracking, and your data is never sold or shared for advertising.</p>
+
+    <h2>Changes and contact</h2>
+    <p>If this policy changes, this page will be updated with a new date. Questions: <a href="mailto:rowninator@gmail.com">rowninator@gmail.com</a>.</p>
+  </main>
+</body>
+</html>

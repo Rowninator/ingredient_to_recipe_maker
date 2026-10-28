@@ -86,6 +86,11 @@ ion-button.ai-btn.is-busy {
 .ai-hint { text-align: center; }
 .ai-btn ion-spinner { width: 18px; height: 18px; margin-right: 8px; color: currentColor; }
 
+/* --- Footer --- */
+/* The link is at least 48px tall to tap (Android's minimum). */
+.page-footer { margin-top: var(--pm-gap-l); text-align: center; font-size: .875rem; }
+.page-footer a { display: inline-flex; align-items: center; min-height: 48px; padding: 0 8px; color: var(--pm-link); }
+
 /* --- Ionic didn't load --- */
 .load-error {
   margin: 0 0 var(--pm-gap-l); padding: 10px 12px; border-radius: 10px;
