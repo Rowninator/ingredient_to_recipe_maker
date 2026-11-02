@@ -79,3 +79,18 @@ All five, in order:
   - every Back case;
   - the privacy link;
   - dark mode.
+
+## 9. Before closed testing: Play's AI-Generated Content policy
+Checked 2026-10-28. Neither page shows a date, so re-check them before closed testing.
+- **The rule:**
+  - [AI-Generated Content policy](https://support.google.com/googleplay/android-developer/answer/13985936): apps that generate content with AI must block Restricted Content.
+  - They must also provide "in-app user reporting or flagging features" so users can flag offensive AI output "without needing to exit the app".
+  - Developers "should utilize user reports to inform content filtering and moderation".
+- **Scope** ([Understanding the policy](https://support.google.com/googleplay/android-developer/answer/14094294)):
+  - **In scope:** text-to-text chatbots where chatting is a central feature; AI image generators; AI voice or video of real people.
+  - **Not in scope "at this time":** apps that only host AI content; apps whose only feature is summarising non-AI content; productivity apps that use AI to improve an existing feature.
+- **Where Pantry Match stands:** it isn't a chatbot or an image app. "Suggest with AI" adds to the app's own recipe matching, which is closest to the productivity exclusion. But the recipes are AI-generated text built from what the user types, and Google, not us, decides the scope. So we treat the rule as applying.
+- ☐ **Learner + Claude:** before closed testing, add a way to report or flag each AI suggestion inside the app, without leaving it, and decide how reports are read and acted on. A `mailto:` link opens another app, so it doesn't meet "without needing to exit the app".
+  - **Options:** a "Report" button on each AI card that posts the suggestion to a new Worker endpoint, and an in-app form. Either needs its own storage, rate limit and privacy-policy update.
+  - **Process:** this is a new feature, so plan it, review it and run it through the security gate like the others. Then update `privacy.html` and the Data safety draft.
+- ☐ Check whether Play Console's App content asks about generative AI features at that point, and answer to match.
