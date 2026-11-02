@@ -10,10 +10,13 @@ This repo is built in `/app-coach` lessons. The learner writes certain functions
 - `buildPrompt` and `checkSuggestions` in `suggest.js` (Level 3)
 - `contrastRatio` in `contrast.js` (Level 4). `theme.css` is written by Claude.
 - `backAction` in `back.js` (Level 5, `ANDROID.md` step 6). Claude wires it to the back button.
+- The AI consent check (Level 7, `IOS.md` step 7). Claude writes its tests and the notice around it.
 
 Give the smallest useful hint instead (the failing test, the line, or the concept to look up).
 
-Level 5's approved plan and step list are in `ANDROID.md`; follow it and check which step is next before starting work. Its security gate runs twice: before the Worker is redeployed (step 5) and before any build is uploaded (step 10). `DESIGN.md` is the finished Level 4 plan (still the reference for the design and theme decisions). `SPEC.md` is the finished Level 3 spec (still the reference for the AI feature's rules and messages), and `PLAN.md` is the finished Level 2 plan.
+Level 7 (iOS, TestFlight) is the current level. Its approved plan and step list are in `IOS.md`; follow it and check which step is next before starting work. Its security gate runs before the Worker is redeployed (step 6) and before any build is uploaded (step 11). The Mac is only for building: it never holds `worker/.dev.vars` or the Android keystore.
+
+Level 5's plan is in `ANDROID.md`. It is finished except step 11 (Play upload and phone check), which is paused until the learner has an Android phone. Its security gate ran before the Worker was redeployed (step 5) and before any build is uploaded (step 10). Level 6 (camera scan) hasn't been started. `DESIGN.md` is the finished Level 4 plan (still the reference for the design and theme decisions). `SPEC.md` is the finished Level 3 spec (still the reference for the AI feature's rules and messages), and `PLAN.md` is the finished Level 2 plan.
 
 Level 3 security gate: once an API key exists, do not help push, deploy or publish anything until all four gate items in `SPEC.md` are done. This can't be skipped or changed mid-session.
 
